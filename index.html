@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nutrición Deportiva · Selector</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Selector-specific styles */
+  .hero {
+    padding: 60px 0 48px;
+    border-bottom: 1px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .hero .system-line {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hero .system-line::before {
+    content: "";
+    display: inline-block;
+    width: 24px; height: 1px;
+    background: var(--muted);
+  }
+  .hero h1 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 52px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin-bottom: 24px;
+    max-width: 800px;
+  }
+  .hero p {
+    font-size: 17px;
+    color: var(--ink-soft);
+    max-width: 640px;
+    line-height: 1.6;
+  }
+
+  .selector-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    margin-bottom: 48px;
+  }
+  .selector-card {
+    background: var(--surface);
+    padding: 36px 32px;
+    text-decoration: none;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    transition: background 0.15s;
+    cursor: pointer;
+    position: relative;
+  }
+  .selector-card:hover {
+    background: #F4F2EB;
+  }
+  .selector-card .num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  .selector-card h2 {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 44px;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .selector-card .subtitle {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+  .selector-card .desc {
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+    margin-bottom: 28px;
+  }
+  .selector-card .features-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .selector-card ul {
+    list-style: none;
+    margin-bottom: 28px;
+  }
+  .selector-card li {
+    padding: 6px 0;
+    font-size: 14px;
+    color: var(--ink-soft);
+    border-bottom: 1px solid var(--hairline);
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .selector-card li:last-child { border-bottom: none; }
+  .selector-card li::before {
+    content: "·";
+    color: var(--accent);
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 1;
+  }
+  .selector-card .meta-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 24px;
+    letter-spacing: 0.5px;
+  }
+  .selector-card .meta-row strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .selector-card .cta {
+    margin-top: auto;
+    padding: 14px 0;
+    border-top: 2px solid var(--ink);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .selector-card .cta .arrow {
+    transition: transform 0.2s;
+  }
+  .selector-card:hover .cta .arrow {
+    transform: translateX(4px);
+  }
+
+  .footer-info {
+    padding: 32px 0 16px;
+    border-top: 1px solid var(--hairline);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+  .footer-info .label {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .footer-info a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .footer-info a:hover { text-decoration: underline; }
+
+  @media (max-width: 800px) {
+    .hero h1 { font-size: 36px; }
+    .hero { padding: 40px 0 32px; margin-bottom: 32px; }
+    .selector-grid { grid-template-columns: 1fr; }
+    .selector-card h2 { font-size: 36px; }
+    .footer-info { grid-template-columns: 1fr; gap: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span>Nutrición Deportiva</span>
+    <span class="sep">/</span>
+    <span class="sub">Selector</span>
+  </div>
+  <div class="status">
+    <span class="dot"></span>
+    <span>Operational</span>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="system-line">Sistema en línea · Selecciona módulo</div>
+    <h1>Calculadora de nutrición deportiva.</h1>
+    <p>Formulación basada en evidencia para geles energéticos y drink mixes caseros. Cálculo preciso de ingredientes, costos comparados con productos comerciales, y registro de lotes experimentales.</p>
+  </section>
+
+  <section class="selector-grid">
+
+    <a href="gel.html" class="selector-card">
+      <div class="num">[ 01 ]</div>
+      <h2>Gel</h2>
+      <div class="subtitle">Energético · Pectina LM</div>
+      <div class="desc">Gel concentrado tipo Maurten/PF30. Sistema pectina + lactato de calcio para gelificación controlada. Diseñado para entregas rápidas de carbohidratos en bolo de 25-35g.</div>
+
+      <div class="features-label">Aplicaciones</div>
+      <ul>
+        <li>Carrera, ciclismo, triatlón olímpico</li>
+        <li>Plan automático para 70.3 con desglose por segmento</li>
+        <li>3 niveles de densidad (fluido/medio/denso)</li>
+        <li>Ratio malto:fructosa configurable</li>
+      </ul>
+
+      <div class="meta-row">
+        <span>Lotes guardados</span>
+        <strong id="gelBatchCount">0</strong>
+      </div>
+
+      <div class="cta">
+        <span>Abrir calculador</span>
+        <span class="arrow">→</span>
+      </div>
+    </a>
+
+    <a href="drinkmix.html" class="selector-card">
+      <div class="num">[ 02 ]</div>
+      <h2>Drink Mix</h2>
+      <div class="subtitle">Electrolítico · Mezcla seca</div>
+      <div class="desc">Polvo soluble en agua. Tres filosofías de formulación: alta carga de carbohidratos, hidratación con sodio elevado, y configuración para calor extremo. Reemplazo casero de Maurten/Beta Fuel.</div>
+
+      <div class="features-label">Aplicaciones</div>
+      <ul>
+        <li>Bici de larga distancia y tiradas continuas</li>
+        <li>Hidratación + carbohidrato simultáneo</li>
+        <li>Sodio configurable 0–1.500 mg/L</li>
+        <li>Comparativa automática vs productos comerciales</li>
+      </ul>
+
+      <div class="meta-row">
+        <span>Lotes guardados</span>
+        <strong id="dmBatchCount">0</strong>
+      </div>
+
+      <div class="cta">
+        <span>Abrir calculador</span>
+        <span class="arrow">→</span>
+      </div>
+    </a>
+
+  </section>
+
+  <div class="footer-info">
+    <div>
+      <span class="label">Versión</span>
+      v0.2 · Junio 2026
+    </div>
+    <div>
+      <span class="label">Origen</span>
+      Valdivia, Chile
+    </div>
+    <div>
+      <span class="label">Proveedor ingredientes</span>
+      <a href="https://mmpp.cl" target="_blank" rel="noopener">mmpp.cl</a> · +569 41540201
+    </div>
+  </div>
+
+</main>
+
+<script>
+// Read batch counts from localStorage and display
+try {
+  const gelBatches = JSON.parse(localStorage.getItem('gel_batches') || '[]');
+  const dmBatches = JSON.parse(localStorage.getItem('dm_batches') || '[]');
+  document.getElementById('gelBatchCount').textContent = gelBatches.length;
+  document.getElementById('dmBatchCount').textContent = dmBatches.length;
+} catch (e) {}
+</script>
+
+</body>
+</html>

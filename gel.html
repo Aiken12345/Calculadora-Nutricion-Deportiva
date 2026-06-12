@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gel · Calculador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span>Nutrición Deportiva</span>
+    <span class="sep">/</span>
+    <span class="sub">Gel</span>
+  </div>
+  <div class="status">
+    <span class="dot"></span>
+    <span>Ready</span>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="calc">Calculadora</button>
+  <button class="tab-btn" data-tab="prep">Preparación</button>
+  <button class="tab-btn" data-tab="science">Ciencia</button>
+  <button class="tab-btn" data-tab="batches">Lotes <span id="batchCount" style="opacity:0.5;"></span></button>
+</nav>
+
+<main>
+
+  <!-- ============ CALCULADORA ============ -->
+  <section class="panel active" id="panel-calc">
+    <div class="calc-grid">
+
+      <!-- LEFT: INPUTS -->
+      <div class="calc-side">
+        <div class="section-title">Configuración</div>
+
+        <div class="subsection-label">Modo de cálculo</div>
+        <div class="btn-group cols-2">
+          <button class="group-btn active" data-mode="quantity">
+            <span class="label">Cantidad</span>
+            <span class="desc">N geles directo</span>
+          </button>
+          <button class="group-btn" data-mode="activity">
+            <span class="label">Actividad</span>
+            <span class="desc">Por duración</span>
+          </button>
+        </div>
+
+        <!-- MODO CANTIDAD -->
+        <div id="modeQuantity" class="subsection">
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Cantidad de geles</span>
+              <div class="slider-value-edit">
+                <input type="number" id="quantity_input" class="value-input" value="1" min="1" max="30" step="1">
+                <span class="unit">ud</span>
+              </div>
+            </div>
+            <input type="range" id="quantity" min="1" max="30" step="1" value="1">
+            <div class="slider-bounds"><span>1</span><span>30</span></div>
+          </div>
+        </div>
+
+        <!-- MODO ACTIVIDAD -->
+        <div id="modeActivity" class="subsection" style="display:none;">
+          <div class="subsection-label">Tipo de actividad</div>
+          <div class="btn-group cols-3">
+            <button class="group-btn active" data-activity="run">
+              <span class="label">Carrera</span>
+            </button>
+            <button class="group-btn" data-activity="bike">
+              <span class="label">Ciclismo</span>
+            </button>
+            <button class="group-btn" data-activity="70.3">
+              <span class="label">70.3</span>
+            </button>
+          </div>
+
+          <!-- Standard activity inputs -->
+          <div id="standardActivity">
+            <div class="slider-row" style="margin-top: 16px;">
+              <div class="slider-header">
+                <span class="slider-label">Duración total</span>
+                <div class="slider-value-edit">
+                  <input type="number" id="duration_input" class="value-input" value="2.0" min="0.5" max="10" step="0.25">
+                  <span class="unit">h</span>
+                </div>
+              </div>
+              <input type="range" id="duration" min="0.5" max="10" step="0.25" value="2.0">
+              <div class="slider-bounds"><span>30min</span><span>10h</span></div>
+            </div>
+
+            <div class="slider-row">
+              <div class="slider-header">
+                <span class="slider-label">Carbos por hora target</span>
+                <div class="slider-value-edit">
+                  <input type="number" id="carbsHr_input" class="value-input" value="60" min="20" max="120" step="5">
+                  <span class="unit">g/h</span>
+                </div>
+              </div>
+              <input type="range" id="carbsHr" min="20" max="120" step="5" value="60">
+              <div class="slider-bounds"><span>20</span><span>120</span></div>
+            </div>
+          </div>
+
+          <!-- 70.3 specific inputs -->
+          <div id="triathlonInputs" style="display:none;">
+            <div class="slider-row" style="margin-top: 16px;">
+              <div class="slider-header">
+                <span class="slider-label">Bici (h)</span>
+                <div class="slider-value-edit">
+                  <input type="number" id="bikeTime_input" class="value-input" value="2.40" min="1.5" max="4" step="0.05">
+                  <span class="unit">h</span>
+                </div>
+              </div>
+              <input type="range" id="bikeTime" min="1.5" max="4" step="0.05" value="2.40">
+              <div class="slider-bounds"><span>1:30</span><span>4:00</span></div>
+            </div>
+
+            <div class="slider-row">
+              <div class="slider-header">
+                <span class="slider-label">Carrera (h)</span>
+                <div class="slider-value-edit">
+                  <input type="number" id="runTime_input" class="value-input" value="1.58" min="1.2" max="3" step="0.05">
+                  <span class="unit">h</span>
+                </div>
+              </div>
+              <input type="range" id="runTime" min="1.2" max="3" step="0.05" value="1.58">
+              <div class="slider-bounds"><span>1:12</span><span>3:00</span></div>
+            </div>
+
+            <div class="slider-row">
+              <div class="slider-header">
+                <span class="slider-label">Carbos/h en bici</span>
+                <div class="slider-value-edit">
+                  <input type="number" id="carbsBike_input" class="value-input" value="70" min="40" max="120" step="5">
+                  <span class="unit">g/h</span>
+                </div>
+              </div>
+              <input type="range" id="carbsBike" min="40" max="120" step="5" value="70">
+              <div class="slider-bounds"><span>40</span><span>120</span></div>
+            </div>
+
+            <div class="slider-row">
+              <div class="slider-header">
+                <span class="slider-label">Carbos/h en carrera</span>
+                <div class="slider-value-edit">
+                  <input type="number" id="carbsRun_input" class="value-input" value="50" min="30" max="90" step="5">
+                  <span class="unit">g/h</span>
+                </div>
+              </div>
+              <input type="range" id="carbsRun" min="30" max="90" step="5" value="50">
+              <div class="slider-bounds"><span>30</span><span>90</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-label">Fórmula del gel</div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Carbos por gel</span>
+              <div class="slider-value-edit">
+                <input type="number" id="carbsPerGel_input" class="value-input" value="30" min="15" max="50" step="1">
+                <span class="unit">g</span>
+              </div>
+            </div>
+            <input type="range" id="carbsPerGel" min="15" max="50" step="1" value="30">
+            <div class="slider-bounds"><span>15g</span><span>50g</span></div>
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Ratio malto:fructosa</span>
+              <div class="slider-value-edit">
+                <input type="number" id="ratio_input" class="value-input" value="2.00" min="0.80" max="3.00" step="0.05">
+                <span class="unit">:1</span>
+              </div>
+            </div>
+            <input type="range" id="ratio" min="0.80" max="3.00" step="0.05" value="2.00">
+            <div class="slider-bounds"><span>0.80</span><span>3.00</span></div>
+          </div>
+
+          <div style="margin-top: 16px;">
+            <div class="subsection-label">Densidad</div>
+            <div class="btn-group cols-3">
+              <button class="group-btn" data-density="fluido">
+                <span class="label">Fluido</span>
+                <span class="desc">Carrera</span>
+              </button>
+              <button class="group-btn" data-density="medio">
+                <span class="label">Medio</span>
+                <span class="desc">General</span>
+              </button>
+              <button class="group-btn active" data-density="denso">
+                <span class="label">Denso</span>
+                <span class="desc">Bici</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-label">Aditivos opcionales</div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Sodio (citrato Na)</span>
+              <div class="slider-value-edit">
+                <input type="number" id="sodium_input" class="value-input" value="200" min="0" max="300" step="10">
+                <span class="unit">mg</span>
+              </div>
+            </div>
+            <input type="range" id="sodium" min="0" max="300" step="10" value="200">
+            <div class="slider-bounds"><span>0</span><span>300mg</span></div>
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Cafeína</span>
+              <div class="slider-value-edit">
+                <input type="number" id="caffeine_input" class="value-input" value="0" min="0" max="100" step="5">
+                <span class="unit">mg</span>
+              </div>
+            </div>
+            <input type="range" id="caffeine" min="0" max="100" step="5" value="0">
+            <div class="slider-bounds"><span>0</span><span>100mg</span></div>
+          </div>
+
+          <div class="slider-row" style="margin-top:14px;">
+            <div class="slider-header">
+              <span class="slider-label">Notas</span>
+            </div>
+            <textarea id="notes" placeholder="ej: probar con extracto de jengibre 0.1g, reducir ácido cítrico..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: OUTPUTS -->
+      <div class="calc-side outputs">
+        <div class="section-title">Resultado</div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Carbos/gel</div>
+            <div class="stat-value"><span id="outCarbsGel">30</span><span class="stat-unit">g</span></div>
+            <div class="stat-sub">Total: <span id="outCarbsTotal">30</span>g · <span id="outNGels">1</span> geles</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Peso por gel</div>
+            <div class="stat-value"><span id="outWeight">49</span><span class="stat-unit">g</span></div>
+            <div class="stat-sub" id="outDensityTag"><span class="stat-tag">Denso</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Costo por gel</div>
+            <div class="stat-value">$<span id="outCost">212</span><span class="stat-unit">CLP</span></div>
+            <div class="stat-sub">ingredientes + sachet</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Ahorro vs comercial</div>
+            <div class="stat-value"><span id="outSavings">91</span><span class="stat-unit">%</span></div>
+            <div class="stat-sub">vs Maurten gel ~$2.500</div>
+          </div>
+        </div>
+
+        <!-- Plan 70.3 (solo cuando aplica) -->
+        <div id="planSection" style="display:none;">
+          <div class="subsection-label" style="margin-top:0;">Plan de fueling sugerido</div>
+          <div class="plan-table table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Segmento</th>
+                  <th class="timing">Tiempo</th>
+                  <th>Geles</th>
+                  <th class="right">Carbos</th>
+                </tr>
+              </thead>
+              <tbody id="planBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="table-wrap" style="margin-top: 8px;">
+          <div class="table-header">
+            <span class="table-title">Ingredientes (1 gel)</span>
+            <span class="table-ref" id="recipeRef">REF / DEN-030</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Ingrediente</th>
+                <th>Función</th>
+                <th class="right">Cantidad</th>
+              </tr>
+            </thead>
+            <tbody id="ingredientsBody"></tbody>
+          </table>
+        </div>
+
+        <div class="subsection-label">Lote experimental</div>
+        <div class="lote-section">
+          <div class="lote-header">
+            <span style="font-family: var(--font-mono); font-size: 12px;">Preparar</span>
+            <input type="number" id="loteN" class="lote-input" value="10" min="1" max="200">
+            <span style="font-family: var(--font-mono); font-size: 12px;">geles · cantidades totales:</span>
+          </div>
+          <table class="lote-table" id="loteTable"></table>
+          <div class="lote-total">
+            <span>Costo total lote</span>
+            <span>$<span id="loteCost">2120</span> CLP</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <input type="text" id="batchName" placeholder="Nombre del lote (ej: Race-day denso v3)" style="flex:1; padding: 10px 14px;">
+          <button class="btn" id="saveBatch">Guardar lote</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PREPARACIÓN ============ -->
+  <section class="panel" id="panel-prep">
+    <div style="margin-bottom: 24px;">
+      <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">Preparación del gel</h2>
+      <p style="color: var(--ink-soft); font-size: 14px;">La pectina + lactato de calcio forman la matriz del gel. El orden de adición es crítico — desviarse genera grumos irreversibles. Sin sorbato: consumo en 24h refrigerado.</p>
+    </div>
+
+    <div class="prep-step">
+      <div class="step-num">01</div>
+      <div class="step-body">
+        <div class="step-title">Premezcla seca</div>
+        <p>Pesa <strong>maltodextrina + fructosa + pectina</strong> en seco. Mezcla con cuchara o tenedor mínimo 1 minuto.</p>
+        <p>La maltodextrina y fructosa dispersan la pectina entre el polvo, impidiendo que forme grumos al contacto con el agua. Este paso es el más importante de toda la receta.</p>
+        <div class="step-note">Si la pectina viene apelmazada, tamízala sola antes de pesarla.</div>
+      </div>
+    </div>
+
+    <div class="prep-step">
+      <div class="step-num">02</div>
+      <div class="step-body">
+        <div class="step-title">Calentar agua</div>
+        <p>Calienta el agua a <strong>70-80°C</strong>. No necesita hervir, bien caliente sin burbujear. Microondas: 25-30 seg en taza pequeña.</p>
+        <div class="step-note danger">⚠ No disuelvas el lactato de calcio ni el ácido cítrico en el agua todavía. Hacerlo gelifica la pectina instantáneamente al contacto y genera grumos. Siempre van al final.</div>
+      </div>
+    </div>
+
+    <div class="prep-step">
+      <div class="step-num">03</div>
+      <div class="step-body">
+        <div class="step-title">Hidratar la pectina</div>
+        <p>Con el minipimer encendido dentro del agua caliente, agrega la premezcla seca <strong>en lluvia lenta</strong>. Espolvorea poco a poco con la otra mano — nunca todo de golpe.</p>
+        <p>Bate a velocidad alta durante <strong>1-2 minutos continuos</strong>. Mantén a 75-80°C. Sin minipimer: bate con fuerza en movimiento circular y cruzando en "8". Debe verse homogénea, sin trozos.</p>
+      </div>
+    </div>
+
+    <div class="prep-step">
+      <div class="step-num">04</div>
+      <div class="step-body">
+        <div class="step-title">Ácido y calcio al final</div>
+        <p>En una tacita, disuelve <strong>ácido cítrico + citrato de sodio</strong> (+ cafeína si aplica) en ~1g de agua. Agrega a la mezcla y bate 20 seg.</p>
+        <p>En otra tacita, disuelve <strong>lactato de calcio</strong> en ~1g de agua. Agrega al final y bate 20 seg.</p>
+        <div class="step-note warn">El lactato dispara la gelificación. La mezcla empezará a espesar visiblemente. Por eso entra al último.</div>
+      </div>
+    </div>
+
+    <div class="prep-step">
+      <div class="step-num">05</div>
+      <div class="step-body">
+        <div class="step-title">Reposo, tamizado, envasado</div>
+        <p>Reposa <strong>20-30 min a temperatura ambiente</strong>. No refrigerar directo — la red pectina-calcio se forma uniformemente. Frío directo puede dejar zonas con texturas distintas.</p>
+        <p>Pasa por <strong>colador fino</strong> al sachet o soft flask. Atrapa cualquier microgrumo residual.</p>
+        <p>Refrigera. <strong>Consumir dentro de 24 horas.</strong></p>
+        <div class="step-note">Lotes recomendados: 6-8 geles por tanda. Más cantidad y se pierde control de temperatura durante la preparación.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CIENCIA ============ -->
+  <section class="panel" id="panel-science">
+    <div style="margin-bottom: 24px;">
+      <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">Ciencia del gel</h2>
+      <p style="color: var(--ink-soft); font-size: 14px;">Lo esencial para entender qué estás haciendo y por qué.</p>
+    </div>
+
+    <div class="tips-grid">
+
+      <div class="tip-card">
+        <h3>Dual transport</h3>
+        <p><strong>SGLT1</strong> absorbe glucosa/maltodextrina hasta ~60 g/h. <strong>GLUT5</strong> absorbe fructosa hasta ~30-40 g/h adicional. La combinación supera el límite de un solo transportador (hasta 120 g/h con gut training).</p>
+        <p>El sodio co-transporta con glucosa en SGLT1, mejorando absorción.</p>
+      </div>
+
+      <div class="tip-card">
+        <h3>Ratio malto:fructosa</h3>
+        <p><strong>2:1</strong> es el estándar, funciona bien hasta 80 g/h, menos dulce.</p>
+        <p><strong>1.5:1</strong> punto intermedio. <strong>1:0.8</strong> mejor oxidación a &gt;90 g/h (Podlogar 2022) pero más dulce — el ácido cítrico contrarresta.</p>
+      </div>
+
+      <div class="tip-card">
+        <h3>Cafeína</h3>
+        <p>Dosis efectiva: <strong>3-6 mg/kg</strong> peso corporal total. Para 65kg: 195-390 mg distribuidos en el evento.</p>
+        <p>Solo en últimos 60-90 min (últimos 2-3 geles). No usar en entrenamiento salvo simulaciones. Pesar con balanza de 0,01g.</p>
+      </div>
+
+      <div class="tip-card">
+        <h3>Densidad y tolerancia</h3>
+        <p><strong>Bici &gt; carrera</strong> en tolerancia GI (menor impacto mecánico, mejor flujo intestinal).</p>
+        <p>Gel <strong>denso</strong> en bici (más energía/volumen), gel <strong>fluido</strong> en carrera (mejor vaciamiento). Reducir carbos/h un 20-30% en carrera respecto a bici.</p>
+      </div>
+
+      <div class="tip-card">
+        <h3>Osmolalidad</h3>
+        <p>Un gel es <strong>hipertónico</strong>: atrae agua al intestino. Si no lo tomas con agua, el efecto osmótico se amplifica y puede causar náuseas o diarrea.</p>
+        <p>Versión densa es más hipertónica que la fluida. Siempre consumir con <strong>100-150 mL de agua</strong>.</p>
+      </div>
+
+      <div class="tip-card">
+        <h3>Timing de ingesta</h3>
+        <p>Máximo <strong>1 gel cada 15-20 min</strong>. En triatlón: primer gel en T1 (salida del agua), fueling principal en bici, reducir frecuencia en carrera.</p>
+        <p>Geles con cafeína solo en los últimos 60-90 min. Considerar café pre-carrera en el total.</p>
+      </div>
+
+      <div class="tip-card">
+        <h3>Gut training</h3>
+        <p>El SGLT1 se regula al alza con exposición repetida. Incluir geles en entrenamiento al menos <strong>8-10 semanas</strong> antes de la carrera.</p>
+        <p>Comenzar con 30-40 g/h e incrementar progresivamente. Mínimo 2 sesiones/semana con ingesta de carbos durante el ejercicio.</p>
+      </div>
+
+      <div class="tip-card">
+        <h3>Sin conservante</h3>
+        <p>Sin sorbato, consumir dentro de <strong>24h refrigerado</strong>. Preparar la víspera de la carrera o entreno.</p>
+        <p>Transportar en bolsa térmica si hace calor. Descartar ante cambio de olor, color o textura.</p>
+        <div class="step-note warn" style="margin-top:8px;font-size:12px;">Para venta comercial agregar sorbato de potasio 0.1% — los 24h no son compatibles con retail.</div>
+      </div>
+
+      <div class="tip-card">
+        <h3>Testeo progresivo</h3>
+        <p>Nunca uses un gel en competencia sin haberlo probado en entrenamiento. Secuencia: <strong>reposo → bici Z2 → bici a ritmo carrera → brick → simulación completa.</strong></p>
+        <p>Cambiar solo una variable por tanda para identificar qué afecta tolerancia y sabor.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ LOTES ============ -->
+  <section class="panel" id="panel-batches">
+    <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 4px;">Lotes guardados</h2>
+        <p style="color: var(--ink-soft); font-size: 14px;">Registra tus experimentos. Compara dos lotes lado a lado.</p>
+      </div>
+    </div>
+
+    <div class="compare-bar" id="compareBar" style="display:none;">
+      <span id="compareBarText">Selecciona 2 lotes para comparar</span>
+      <div>
+        <button id="compareBtn" disabled>Comparar</button>
+        <button id="cancelCompare" style="margin-left:8px;">Cancelar</button>
+      </div>
+    </div>
+
+    <div id="compareView"></div>
+    <div id="batchesList"></div>
+  </section>
+
+</main>
+
+<div class="toast" id="toast">Lote guardado</div>
+
+<script>
+// ============ CONSTANTS ============
+const DENSITY_FACTORS = {
+  fluido: { pectin: 0.0167, water: 0.667, calcium: 0.00333 },
+  medio:  { pectin: 0.0267, water: 0.600, calcium: 0.00500 },
+  denso:  { pectin: 0.0367, water: 0.550, calcium: 0.00600 }
+};
+const DENSITY_LABEL = { fluido: 'Fluido', medio: 'Medio', denso: 'Denso' };
+const CITRIC_PER_CARB = 0.00667; // 0.2g per 30g carb
+
+const NA_PER_G_CITRATE = 267;
+
+const COSTS = {
+  maltodextrin: 5,
+  fructose: 8,
+  pectin: 48,
+  citricAcid: 10,
+  calciumLactate: 10,
+  sodiumCitrate: 5,
+  caffeine: 1000,
+  sachet: 65
+};
+
+const COMMERCIAL_GEL_PRICE = 2500; // CLP per Maurten-like gel
+
+let state = {
+  mode: 'quantity', // 'quantity' or 'activity'
+  quantity: 1,
+  activity: 'run', // 'run' | 'bike' | '70.3'
+  duration: 2.0,
+  carbsHr: 60,
+  bikeTime: 2.40,
+  runTime: 1.58,
+  carbsBike: 70,
+  carbsRun: 50,
+  carbsPerGel: 30,
+  ratio: 2.00,
+  density: 'denso',
+  sodium: 200,
+  caffeine: 0,
+  notes: ''
+};
+
+let savedBatches = [];
+let compareMode = false;
+let selectedForCompare = [];
+
+// ============ CALCULATION ============
+function calculate() {
+  const r = state.ratio;
+  const c = state.carbsPerGel;
+  const factor = DENSITY_FACTORS[state.density];
+
+  const malto = c * r / (r + 1);
+  const fructose = c / (r + 1);
+  const pectin = c * factor.pectin;
+  const water = c * factor.water;
+  const calciumLactate = c * factor.calcium;
+  const citricAcid = c * CITRIC_PER_CARB;
+  const sodiumCitrate = state.sodium / NA_PER_G_CITRATE;
+  const caffeineG = state.caffeine / 1000;
+
+  const weight = malto + fructose + pectin + water + citricAcid + calciumLactate + sodiumCitrate + caffeineG;
+
+  const cost = Math.round(
+    malto * COSTS.maltodextrin +
+    fructose * COSTS.fructose +
+    pectin * COSTS.pectin +
+    citricAcid * COSTS.citricAcid +
+    calciumLactate * COSTS.calciumLactate +
+    sodiumCitrate * COSTS.sodiumCitrate +
+    caffeineG * COSTS.caffeine +
+    COSTS.sachet
+  );
+
+  const savings = Math.round(((COMMERCIAL_GEL_PRICE - cost) / COMMERCIAL_GEL_PRICE) * 100);
+
+  return { malto, fructose, pectin, water, calciumLactate, citricAcid, sodiumCitrate, caffeineG, weight, cost, savings };
+}
+
+function calculateNGeles() {
+  if (state.mode === 'quantity') return state.quantity;
+  if (state.activity === '70.3') {
+    // T1 (1) + Bici + T2 (1) + Carrera
+    const biciG = state.bikeTime * state.carbsBike / state.carbsPerGel;
+    const runG = state.runTime * state.carbsRun / state.carbsPerGel;
+    return Math.ceil(biciG + runG + 2); // +2 for transitions
+  }
+  return Math.ceil((state.duration * state.carbsHr) / state.carbsPerGel);
+}
+
+function calculate703Plan() {
+  const biciCarbs = state.bikeTime * state.carbsBike;
+  const runCarbs = state.runTime * state.carbsRun;
+  const biciGeles = Math.ceil(biciCarbs / state.carbsPerGel);
+  const runGeles = Math.ceil(runCarbs / state.carbsPerGel);
+  return [
+    { segment: 'T1', timing: 'Salida agua', geles: 1, carbs: state.carbsPerGel, note: 'Estándar' },
+    { segment: 'Bici', timing: `${formatHM(state.bikeTime)} target`, geles: biciGeles, carbs: biciGeles * state.carbsPerGel, note: `1 cada ~${Math.round(state.bikeTime * 60 / biciGeles)} min` },
+    { segment: 'T2', timing: 'Bajada bici', geles: 1, carbs: state.carbsPerGel, note: 'Con cafeína' },
+    { segment: 'Carrera', timing: `${formatHM(state.runTime)} target`, geles: runGeles, carbs: runGeles * state.carbsPerGel, note: `Reducir frecuencia` }
+  ];
+}
+
+function formatHM(hours) {
+  const h = Math.floor(hours);
+  const m = Math.round((hours - h) * 60);
+  return `${h}:${String(m).padStart(2,'0')}`;
+}
+
+// ============ RENDER ============
+function render() {
+  const c = calculate();
+  const n = calculateNGeles();
+  const totalCarbs = n * state.carbsPerGel;
+
+  document.getElementById('outCarbsGel').textContent = state.carbsPerGel;
+  document.getElementById('outCarbsTotal').textContent = totalCarbs;
+  document.getElementById('outNGels').textContent = n;
+  document.getElementById('outWeight').textContent = c.weight.toFixed(1);
+  document.getElementById('outCost').textContent = c.cost.toLocaleString('es-CL');
+  document.getElementById('outSavings').textContent = c.savings;
+
+  document.getElementById('outDensityTag').innerHTML = `<span class="stat-tag">${DENSITY_LABEL[state.density]}</span>`;
+
+  const recipeCode = `${state.density.substring(0,3).toUpperCase()}-${String(state.carbsPerGel).padStart(3,'0')}`;
+  document.getElementById('recipeRef').textContent = `REF / ${recipeCode}`;
+
+  // Plan 70.3
+  if (state.mode === 'activity' && state.activity === '70.3') {
+    const plan = calculate703Plan();
+    document.getElementById('planSection').style.display = 'block';
+    document.getElementById('planBody').innerHTML = plan.map(p => `
+      <tr>
+        <td class="ingredient">${p.segment}</td>
+        <td class="timing">${p.timing}</td>
+        <td>${p.geles} <span style="color:var(--muted);font-size:11px;">· ${p.note}</span></td>
+        <td class="num">${p.carbs} g</td>
+      </tr>
+    `).join('');
+    const totalGeles = plan.reduce((s,p) => s+p.geles, 0);
+    const totalCarbs = plan.reduce((s,p) => s+p.carbs, 0);
+    document.getElementById('planBody').innerHTML += `<tr style="border-top:1px solid var(--ink);">
+      <td class="ingredient" style="font-weight:600;">TOTAL</td>
+      <td></td>
+      <td><strong>${totalGeles} geles</strong></td>
+      <td class="num"><strong>${totalCarbs} g</strong></td>
+    </tr>`;
+  } else {
+    document.getElementById('planSection').style.display = 'none';
+  }
+
+  // Ingredients table (1 gel)
+  const rows = [];
+  if (c.malto > 0) rows.push(['Maltodextrina', 'Carbo base', c.malto, 'g']);
+  if (c.fructose > 0) rows.push(['Fructosa', 'Carbo secundario', c.fructose, 'g']);
+  if (c.pectin > 0) rows.push(['Pectina', 'Espesante', c.pectin, 'g']);
+  if (c.water > 0) rows.push(['Agua', 'Fase líquida', c.water, 'g']);
+  if (c.citricAcid > 0) rows.push(['Ácido cítrico', 'Acidez · al final', c.citricAcid, 'g']);
+  if (c.calciumLactate > 0) rows.push(['Lactato de calcio', 'Gelificación · al final', c.calciumLactate, 'g']);
+  if (c.sodiumCitrate > 0) rows.push(['Citrato de sodio', `Sodio ~${state.sodium}mg`, c.sodiumCitrate, 'g']);
+  if (state.caffeine > 0) rows.push(['Cafeína anhidra', 'Ergogénico', state.caffeine, 'mg']);
+
+  document.getElementById('ingredientsBody').innerHTML = rows.map(r => {
+    const val = r[3] === 'mg' ? r[2].toFixed(0) : r[2].toFixed(2);
+    return `<tr><td class="ingredient">${r[0]}</td><td class="role">${r[1]}</td><td class="num">${val} ${r[3]}</td></tr>`;
+  }).join('');
+
+  renderLote(c);
+}
+
+function renderLote(c) {
+  const n = parseInt(document.getElementById('loteN').value) || 1;
+  const rows = [];
+  if (c.malto > 0) rows.push(['Maltodextrina', c.malto * n, 'g']);
+  if (c.fructose > 0) rows.push(['Fructosa', c.fructose * n, 'g']);
+  if (c.pectin > 0) rows.push(['Pectina', c.pectin * n, 'g']);
+  if (c.water > 0) rows.push(['Agua', c.water * n, 'g']);
+  if (c.citricAcid > 0) rows.push(['Ácido cítrico', c.citricAcid * n, 'g']);
+  if (c.calciumLactate > 0) rows.push(['Lactato de calcio', c.calciumLactate * n, 'g']);
+  if (c.sodiumCitrate > 0) rows.push(['Citrato de sodio', c.sodiumCitrate * n, 'g']);
+  if (state.caffeine > 0) rows.push(['Cafeína', state.caffeine * n, 'mg']);
+  rows.push(['Sachets', n, 'ud']);
+
+  document.getElementById('loteTable').innerHTML = rows.map(r => {
+    const val = r[2] === 'mg' || r[2] === 'ud' ? r[1].toFixed(0) : r[1].toFixed(1);
+    return `<tr><td>${r[0]}</td><td>${val} ${r[2]}</td></tr>`;
+  }).join('');
+  document.getElementById('loteCost').textContent = (c.cost * n).toLocaleString('es-CL');
+}
+
+// ============ UI STATE ============
+function applyMode(mode) {
+  state.mode = mode;
+  document.querySelectorAll('[data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  document.getElementById('modeQuantity').style.display = mode === 'quantity' ? 'block' : 'none';
+  document.getElementById('modeActivity').style.display = mode === 'activity' ? 'block' : 'none';
+  applyActivity(state.activity);
+  saveState();
+  render();
+}
+
+function applyActivity(activity) {
+  state.activity = activity;
+  document.querySelectorAll('[data-activity]').forEach(b => b.classList.toggle('active', b.dataset.activity === activity));
+  document.getElementById('standardActivity').style.display = activity === '70.3' ? 'none' : 'block';
+  document.getElementById('triathlonInputs').style.display = activity === '70.3' ? 'block' : 'none';
+  saveState();
+  render();
+}
+
+function applyDensity(density) {
+  state.density = density;
+  document.querySelectorAll('[data-density]').forEach(b => b.classList.toggle('active', b.dataset.density === density));
+  saveState();
+  render();
+}
+
+function syncInputsToState() {
+  const numericFields = [
+    ['quantity', state.quantity, 0],
+    ['carbsPerGel', state.carbsPerGel, 0],
+    ['ratio', state.ratio, 2],
+    ['sodium', state.sodium, 0],
+    ['caffeine', state.caffeine, 0],
+    ['duration', state.duration, 2],
+    ['carbsHr', state.carbsHr, 0],
+    ['bikeTime', state.bikeTime, 2],
+    ['runTime', state.runTime, 2],
+    ['carbsBike', state.carbsBike, 0],
+    ['carbsRun', state.carbsRun, 0]
+  ];
+  numericFields.forEach(([id, val, dec]) => {
+    const range = document.getElementById(id);
+    const input = document.getElementById(id + '_input');
+    if (range) range.value = val;
+    if (input) input.value = dec > 0 ? val.toFixed(dec) : val;
+  });
+  document.getElementById('notes').value = state.notes;
+}
+
+// ============ RANGE + INPUT BIND ============
+function bindRangeInput(key, isFloat, decimals) {
+  const range = document.getElementById(key);
+  const input = document.getElementById(key + '_input');
+  if (!range || !input) return;
+
+  const update = (val, source) => {
+    let v = isFloat ? parseFloat(val) : parseInt(val);
+    if (isNaN(v)) return;
+    const min = parseFloat(range.min);
+    const max = parseFloat(range.max);
+    if (v < min) v = min;
+    if (v > max) v = max;
+    state[key] = v;
+    if (source !== 'range') range.value = v;
+    if (source !== 'input') input.value = decimals > 0 ? v.toFixed(decimals) : v;
+    saveState();
+    render();
+  };
+
+  range.addEventListener('input', e => update(e.target.value, 'range'));
+  input.addEventListener('input', e => {
+    let v = isFloat ? parseFloat(e.target.value) : parseInt(e.target.value);
+    if (isNaN(v)) return;
+    state[key] = v;
+    range.value = v;
+    saveState();
+    render();
+  });
+  input.addEventListener('blur', e => {
+    let v = isFloat ? parseFloat(e.target.value) : parseInt(e.target.value);
+    if (isNaN(v)) v = state[key];
+    update(v, null);
+  });
+}
+
+// ============ EVENTS ============
+function attachEvents() {
+  document.querySelectorAll('[data-mode]').forEach(btn => {
+    btn.addEventListener('click', () => applyMode(btn.dataset.mode));
+  });
+  document.querySelectorAll('[data-activity]').forEach(btn => {
+    btn.addEventListener('click', () => applyActivity(btn.dataset.activity));
+  });
+  document.querySelectorAll('[data-density]').forEach(btn => {
+    btn.addEventListener('click', () => applyDensity(btn.dataset.density));
+  });
+
+  bindRangeInput('quantity', false, 0);
+  bindRangeInput('carbsPerGel', false, 0);
+  bindRangeInput('ratio', true, 2);
+  bindRangeInput('sodium', false, 0);
+  bindRangeInput('caffeine', false, 0);
+  bindRangeInput('duration', true, 2);
+  bindRangeInput('carbsHr', false, 0);
+  bindRangeInput('bikeTime', true, 2);
+  bindRangeInput('runTime', true, 2);
+  bindRangeInput('carbsBike', false, 0);
+  bindRangeInput('carbsRun', false, 0);
+
+  document.getElementById('notes').addEventListener('input', e => {
+    state.notes = e.target.value;
+    saveState();
+  });
+  document.getElementById('loteN').addEventListener('input', () => render());
+  document.getElementById('saveBatch').addEventListener('click', saveBatch);
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+  document.getElementById('cancelCompare').addEventListener('click', () => {
+    compareMode = false;
+    selectedForCompare = [];
+    document.getElementById('compareBar').style.display = 'none';
+    document.getElementById('compareView').innerHTML = '';
+    renderBatches();
+  });
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === `panel-${tab}`));
+  if (tab === 'batches') renderBatches();
+}
+
+// ============ STORAGE ============
+function saveState() {
+  try { localStorage.setItem('gel_currentState', JSON.stringify(state)); } catch(e) {}
+}
+function loadState() {
+  try {
+    const s = localStorage.getItem('gel_currentState');
+    if (s) state = { ...state, ...JSON.parse(s) };
+  } catch(e) {}
+}
+function loadBatches() {
+  try {
+    const b = localStorage.getItem('gel_batches');
+    if (b) savedBatches = JSON.parse(b);
+  } catch(e) { savedBatches = []; }
+  updateBatchCount();
+}
+function persistBatches() {
+  try { localStorage.setItem('gel_batches', JSON.stringify(savedBatches)); } catch(e) {}
+  updateBatchCount();
+}
+function updateBatchCount() {
+  document.getElementById('batchCount').textContent = savedBatches.length > 0 ? `· ${savedBatches.length}` : '';
+}
+function saveBatch() {
+  const nameInput = document.getElementById('batchName');
+  const name = nameInput.value.trim() || `Lote ${savedBatches.length + 1}`;
+  const c = calculate();
+  savedBatches.unshift({
+    id: Date.now(),
+    name,
+    state: { ...state },
+    calc: { weight: c.weight, cost: c.cost, savings: c.savings },
+    savedAt: new Date().toISOString()
+  });
+  persistBatches();
+  nameInput.value = '';
+  showToast(`Guardado: ${name}`);
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ============ BATCHES UI ============
+function renderBatches() {
+  const container = document.getElementById('batchesList');
+  if (savedBatches.length === 0) {
+    container.innerHTML = `<div class="empty-state"><p>Sin lotes guardados · Configura un lote en la calculadora y presiona "Guardar"</p></div>`;
+    document.getElementById('compareBar').style.display = 'none';
+    return;
+  }
+
+  container.innerHTML = savedBatches.map(b => {
+    const densityLabel = DENSITY_LABEL[b.state.density] || b.state.density;
+    const checked = selectedForCompare.includes(b.id) ? 'checked' : '';
+    return `
+    <div class="saved-batch">
+      <div class="batch-info">
+        <h4>
+          ${compareMode ? `<input type="checkbox" class="batch-checkbox" data-id="${b.id}" ${checked}>` : ''}
+          <span class="batch-preset">${densityLabel}</span>
+          ${b.name}
+        </h4>
+        <div class="batch-stats">${b.state.carbsPerGel}g carbos · ratio ${b.state.ratio.toFixed(2)} · ${b.state.sodium}mg Na · ${b.state.caffeine}mg cafe · $${b.calc.cost.toLocaleString('es-CL')} CLP</div>
+        ${b.state.notes ? `<div class="batch-notes">${b.state.notes}</div>` : ''}
+      </div>
+      <div class="batch-actions">
+        <button data-action="load" data-id="${b.id}">Cargar</button>
+        <button data-action="delete" data-id="${b.id}" class="danger">Eliminar</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  if (savedBatches.length >= 2) {
+    const bar = document.getElementById('compareBar');
+    bar.style.display = 'flex';
+    document.getElementById('compareBarText').textContent = compareMode ?
+      `${selectedForCompare.length} de 2 lotes seleccionados` :
+      'Activa modo comparar para seleccionar 2 lotes';
+    const cBtn = document.getElementById('compareBtn');
+    cBtn.disabled = compareMode && selectedForCompare.length !== 2;
+    cBtn.textContent = compareMode ? 'Comparar' : 'Activar modo comparar';
+    cBtn.onclick = compareMode ? renderCompareView : () => { compareMode = true; renderBatches(); };
+  }
+
+  container.querySelectorAll('button[data-action]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = parseInt(btn.dataset.id);
+      if (btn.dataset.action === 'load') loadBatch(id);
+      else deleteBatch(id);
+    });
+  });
+  container.querySelectorAll('.batch-checkbox').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const id = parseInt(cb.dataset.id);
+      if (cb.checked) {
+        if (selectedForCompare.length >= 2) { cb.checked = false; showToast('Máximo 2 lotes'); return; }
+        selectedForCompare.push(id);
+      } else {
+        selectedForCompare = selectedForCompare.filter(x => x !== id);
+      }
+      renderBatches();
+    });
+  });
+}
+
+function loadBatch(id) {
+  const batch = savedBatches.find(b => b.id === id);
+  if (!batch) return;
+  state = { ...batch.state };
+  syncInputsToState();
+  applyMode(state.mode);
+  applyActivity(state.activity);
+  applyDensity(state.density);
+  saveState();
+  render();
+  switchTab('calc');
+  showToast(`Cargado: ${batch.name}`);
+}
+function deleteBatch(id) {
+  const batch = savedBatches.find(b => b.id === id);
+  if (!batch) return;
+  if (!confirm(`¿Eliminar "${batch.name}"?`)) return;
+  savedBatches = savedBatches.filter(b => b.id !== id);
+  selectedForCompare = selectedForCompare.filter(x => x !== id);
+  persistBatches();
+  renderBatches();
+  showToast('Lote eliminado');
+}
+
+function renderCompareView() {
+  if (selectedForCompare.length !== 2) return;
+  const batches = selectedForCompare.map(id => savedBatches.find(b => b.id === id));
+  const view = document.getElementById('compareView');
+  view.innerHTML = `<div class="compare-view" style="grid-template-columns: 1fr 1fr;">
+    ${batches.map(b => `
+      <div class="compare-col">
+        <h4>${b.name}</h4>
+        <div class="meta">${DENSITY_LABEL[b.state.density]} · ${new Date(b.savedAt).toLocaleDateString('es-CL')}</div>
+        <table>
+          <tr><th>Carbos/gel</th><td class="num">${b.state.carbsPerGel} g</td></tr>
+          <tr><th>Ratio</th><td class="num">${b.state.ratio.toFixed(2)}:1</td></tr>
+          <tr><th>Densidad</th><td class="num">${DENSITY_LABEL[b.state.density]}</td></tr>
+          <tr><th>Peso/gel</th><td class="num">${b.calc.weight.toFixed(1)} g</td></tr>
+          <tr><th>Sodio</th><td class="num">${b.state.sodium} mg</td></tr>
+          <tr><th>Cafeína</th><td class="num">${b.state.caffeine} mg</td></tr>
+          <tr><th>Costo/gel</th><td class="num">$${b.calc.cost.toLocaleString('es-CL')}</td></tr>
+          <tr><th>Ahorro</th><td class="num">${b.calc.savings}%</td></tr>
+        </table>
+        ${b.state.notes ? `<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--hairline);font-size:12px;color:var(--ink-soft);"><strong>Notas:</strong> ${b.state.notes}</div>` : ''}
+      </div>`).join('')}
+  </div>`;
+}
+
+// ============ INIT ============
+function init() {
+  loadState();
+  loadBatches();
+  syncInputsToState();
+  applyMode(state.mode);
+  applyActivity(state.activity);
+  applyDensity(state.density);
+  attachEvents();
+  render();
+}
+init();
+</script>
+
+</body>
+</html>

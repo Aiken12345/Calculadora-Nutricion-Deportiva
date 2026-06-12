@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drink Mix · Calculador</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <span>Nutrición Deportiva</span>
+    <span class="sep">/</span>
+    <span class="sub">Drink Mix</span>
+  </div>
+  <div class="status">
+    <span class="dot"></span>
+    <span>Ready</span>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="calc">Calculadora</button>
+  <button class="tab-btn" data-tab="prep">Preparación</button>
+  <button class="tab-btn" data-tab="science">Ciencia</button>
+  <button class="tab-btn" data-tab="batches">Lotes <span id="batchCount" style="opacity:0.5;"></span></button>
+</nav>
+
+<main>
+
+  <!-- ============ CALCULADORA ============ -->
+  <section class="panel active" id="panel-calc">
+    <div class="calc-grid">
+
+      <!-- LEFT: INPUTS -->
+      <div class="calc-side">
+        <div class="section-title">Configuración</div>
+
+        <div class="subsection-label">Preset</div>
+        <div class="btn-group cols-4">
+          <button class="group-btn active" data-preset="A">
+            <span class="label">A</span>
+            <span class="desc">High-carb</span>
+          </button>
+          <button class="group-btn" data-preset="B">
+            <span class="label">B</span>
+            <span class="desc">Hydration</span>
+          </button>
+          <button class="group-btn" data-preset="C">
+            <span class="label">C</span>
+            <span class="desc">Hot</span>
+          </button>
+          <button class="group-btn" data-preset="custom">
+            <span class="label">⋯</span>
+            <span class="desc">Custom</span>
+          </button>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-label">Volumen botella</div>
+          <div class="btn-group cols-5">
+            <button class="group-btn volume-btn" data-volume="400">400</button>
+            <button class="group-btn volume-btn active" data-volume="500">500</button>
+            <button class="group-btn volume-btn" data-volume="600">600</button>
+            <button class="group-btn volume-btn" data-volume="750">750</button>
+            <button class="group-btn volume-btn" data-volume="1000">1000</button>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-label">Carbohidratos</div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Carbos totales</span>
+              <div class="slider-value-edit">
+                <input type="number" id="carbs_input" class="value-input" value="80" min="10" max="120" step="1">
+                <span class="unit">g</span>
+              </div>
+            </div>
+            <input type="range" id="carbs" min="10" max="120" step="1" value="80">
+            <div class="slider-bounds"><span>10g</span><span>120g</span></div>
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Ratio malto:fructosa</span>
+              <div class="slider-value-edit">
+                <input type="number" id="ratio_input" class="value-input" value="1.30" min="0.80" max="2.50" step="0.05">
+                <span class="unit">:1</span>
+              </div>
+            </div>
+            <input type="range" id="ratio" min="0.80" max="2.50" step="0.05" value="1.30">
+            <div class="slider-bounds"><span>0.80 (alta osc.)</span><span>2.50 (clásico)</span></div>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-label">Electrolitos</div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Sodio target</span>
+              <div class="slider-value-edit">
+                <input type="number" id="sodium_input" class="value-input" value="290" min="0" max="1500" step="10">
+                <span class="unit">mg</span>
+              </div>
+            </div>
+            <input type="range" id="sodium" min="0" max="1500" step="10" value="290">
+            <div class="slider-bounds"><span>0</span><span>1500mg</span></div>
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Fuente de sodio</span>
+            </div>
+            <select id="sodiumSource">
+              <option value="citrate">Citrato de sodio (alcalino, suave)</option>
+              <option value="chloride">Cloruro de sodio (sal de mesa)</option>
+              <option value="mix">Mezcla 50/50</option>
+            </select>
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Potasio</span>
+              <div class="slider-value-edit">
+                <input type="number" id="potassium_input" class="value-input" value="0" min="0" max="300" step="5">
+                <span class="unit">mg</span>
+              </div>
+            </div>
+            <input type="range" id="potassium" min="0" max="300" step="5" value="0">
+            <div class="slider-bounds"><span>0</span><span>300mg</span></div>
+          </div>
+        </div>
+
+        <div class="subsection">
+          <div class="subsection-label">Sabor · ergogénicos</div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Ácido cítrico</span>
+              <div class="slider-value-edit">
+                <input type="number" id="citric_input" class="value-input" value="0.4" min="0" max="2.0" step="0.1">
+                <span class="unit">g</span>
+              </div>
+            </div>
+            <input type="range" id="citric" min="0" max="2.0" step="0.1" value="0.4">
+            <div class="slider-bounds"><span>0g</span><span>2.0g</span></div>
+          </div>
+
+          <div class="slider-row">
+            <div class="slider-header">
+              <span class="slider-label">Cafeína</span>
+              <div class="slider-value-edit">
+                <input type="number" id="caffeine_input" class="value-input" value="0" min="0" max="200" step="5">
+                <span class="unit">mg</span>
+              </div>
+            </div>
+            <input type="range" id="caffeine" min="0" max="200" step="5" value="0">
+            <div class="slider-bounds"><span>0</span><span>200mg</span></div>
+          </div>
+
+          <div class="slider-row" style="margin-top:14px;">
+            <div class="slider-header">
+              <span class="slider-label">Notas de sabor</span>
+            </div>
+            <textarea id="notes" placeholder="ej: extracto de limón 5 gotas, jengibre en polvo 0.2g..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: OUTPUTS -->
+      <div class="calc-side outputs">
+        <div class="section-title">Resultado</div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Carbos</div>
+            <div class="stat-value"><span id="outCarbs">80</span><span class="stat-unit">g</span></div>
+            <div class="stat-sub" id="outCarbHr">→ 80 g/h a 1 botella/h</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Concentración</div>
+            <div class="stat-value"><span id="outConc">16.0</span><span class="stat-unit">%</span></div>
+            <div id="concTag"><span class="stat-tag warn">Hipertónica</span></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Sodio</div>
+            <div class="stat-value"><span id="outSod">290</span><span class="stat-unit">mg</span></div>
+            <div class="stat-sub"><span id="outSodL">580</span> mg/L</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Costo unidad</div>
+            <div class="stat-value">$<span id="outCost">605</span><span class="stat-unit">CLP</span></div>
+            <div class="stat-sub">ingredientes + sachet</div>
+          </div>
+        </div>
+
+        <div class="subsection-label" style="margin-top:0;">Comparativa comercial</div>
+        <div id="commercialComp"></div>
+
+        <div class="table-wrap" style="margin-top: 20px;">
+          <div class="table-header">
+            <span class="table-title">Ingredientes</span>
+            <span class="table-ref" id="recipeRef">REF / A-080</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Ingrediente</th>
+                <th>Función</th>
+                <th class="right">Cantidad</th>
+              </tr>
+            </thead>
+            <tbody id="ingredientsBody"></tbody>
+          </table>
+        </div>
+
+        <div class="subsection-label">Lote experimental</div>
+        <div class="lote-section">
+          <div class="lote-header">
+            <span style="font-family: var(--font-mono); font-size: 12px;">Preparar</span>
+            <input type="number" id="loteN" class="lote-input" value="10" min="1" max="500">
+            <span style="font-family: var(--font-mono); font-size: 12px;">sachets · cantidades totales:</span>
+          </div>
+          <table class="lote-table" id="loteTable"></table>
+          <div class="lote-total">
+            <span>Costo total lote</span>
+            <span>$<span id="loteCost">6050</span> CLP</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <input type="text" id="batchName" placeholder="Nombre del lote (ej: Race-day A v2)" style="flex:1; padding: 10px 14px;">
+          <button class="btn" id="saveBatch">Guardar lote</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PREPARACIÓN ============ -->
+  <section class="panel" id="panel-prep">
+    <div style="margin-bottom: 24px;">
+      <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">Preparación de drink mix</h2>
+      <p style="color: var(--ink-soft); font-size: 14px;">El drink mix es producto seco. No tiene gelificación que controlar — lo único crítico es la homogeneidad de la mezcla. Si las sales se segregan al fondo del lote, los sachets quedan inconsistentes.</p>
+    </div>
+
+    <div class="prep-step">
+      <div class="step-num">01</div>
+      <div class="step-body">
+        <div class="step-title">Pesar ingredientes</div>
+        <p>Pesar cada ingrediente con balanza de 0,1g de precisión. Las sales (sodio, potasio, ácido cítrico) son las que más cuidado requieren — diferencias de 0,2g cambian el sodio total significativamente.</p>
+        <p><strong>Sin balanza de precisión:</strong> no improvises. Compra una de joyería ($15-25k en MercadoLibre Chile). Es la inversión más rentable del proyecto.</p>
+      </div>
+    </div>
+
+    <div class="prep-step">
+      <div class="step-num">02</div>
+      <div class="step-body">
+        <div class="step-title">Mezcla en seco</div>
+        <p>Combinar todos los ingredientes en un recipiente seco. Tapar y agitar enérgicamente durante <strong>2 minutos mínimo</strong>. Romper grumos visibles con cuchara seca.</p>
+        <p>Para múltiples sachets, mezclar primero el total y luego dosificar. La homogeneidad del lote completo es más fiable que mezclar sachet por sachet.</p>
+        <div class="step-note warn">⚠ Las sales pueden migrar al fondo por densidad. Si el lote queda guardado, agitar de nuevo antes de dosificar.</div>
+      </div>
+    </div>
+
+    <div class="prep-step">
+      <div class="step-num">03</div>
+      <div class="step-body">
+        <div class="step-title">Envasar</div>
+        <p>Dosificar en sachets individuales o en tarro con scoop calibrado. Los sachets son más prácticos en carrera (no hay que medir), pero el tarro multidosis ahorra plástico para entrenamientos.</p>
+        <p>Si vas a tarro: pesar y marcar el scoop exacto para una dosis. No confíes en "una cucharada" — varía mucho.</p>
+      </div>
+    </div>
+
+    <div class="prep-step">
+      <div class="step-num">04</div>
+      <div class="step-body">
+        <div class="step-title">Uso en botella</div>
+        <p>Vaciar sachet en botella con el volumen correspondiente de agua fría. Agitar enérgicamente durante <strong>30 segundos</strong>. La maltodextrina demora unos segundos en hidratarse — si quedan grumos, agitar más.</p>
+        <p>El producto se mantiene homogéneo 4-6 horas. Para tiradas largas, agitar la botella cada hora.</p>
+        <div class="step-note">Tip: agua fría disuelve más rápido y mejora la palatabilidad. Con calor (&gt;20°C) puede ser menos refrescante.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CIENCIA ============ -->
+  <section class="panel" id="panel-science">
+    <div style="margin-bottom: 24px;">
+      <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">Ciencia del drink mix</h2>
+      <p style="color: var(--ink-soft); font-size: 14px;">Lo esencial para entender qué estás haciendo y por qué.</p>
+    </div>
+
+    <div class="tips-grid">
+
+      <div class="tip-card">
+        <h3>Osmolalidad</h3>
+        <p>La <strong>osmolalidad</strong> controla el vaciamiento gástrico. Hipotónica (&lt;280) vacía rápido pero entrega poco carbo. Hipertónica (&gt;300) entrega más carbo pero vacía más lento.</p>
+        <p>El "límite del 6-8%" que dicen los libros viejos era cierto con <strong>glucosa pura</strong>. La maltodextrina, al ser polímero, contribuye mucho menos a la osmolalidad. Por eso se puede llegar al 14-16% con malto+fructosa sin destruir el estómago.</p>
+      </div>
+
+      <div class="tip-card">
+        <h3>Dual transport</h3>
+        <p><strong>SGLT1</strong> absorbe glucosa/maltodextrina hasta ~60 g/h. <strong>GLUT5</strong> absorbe fructosa adicional (~30-40 g/h).</p>
+        <p>La combinación supera el límite de un solo transportador. Para drink mix de alta concentración, el ratio óptimo es <code>1:0.8</code>, no 2:1. Más fructosa proporcional = mejor oxidación cuando empujas &gt;90 g/h.</p>
+      </div>
+
+      <div class="tip-card">
+        <h3>El mito del hidrogel</h3>
+        <p>El <strong>"hidrogel"</strong> de Maurten es 80% marketing. La premisa es que el alginato forma un gel en el estómago y reduce el impacto osmótico. Pero múltiples estudios (Baur 2019, King 2020) no encontraron diferencia vs solución control con misma composición.</p>
+        <p>Maurten funciona porque la <strong>fórmula es buena</strong>, no por el hidrogel. No vale la pena replicarlo.</p>
+      </div>
+
+      <div class="tip-card">
+        <h3>Sodio: el variable individual</h3>
+        <p>Pérdidas de sodio en sudor: <strong>200-2.000 mg/L</strong>. La mayoría está entre 500-1.000 mg/L.</p>
+        <p>Clima fresco: 400-600 mg Na/L. Calor: 700-1.000. Ultra/calor extremo: hasta 1.500. Sin test de sudor, empieza en el rango medio y ajusta por sensación (calambres, sed, niebla cognitiva).</p>
+      </div>
+
+      <div class="tip-card">
+        <h3>Citrato vs Cloruro</h3>
+        <p><strong>Citrato de sodio:</strong> alcalinizante, buffer de pH, sabor menos salado. Aporta ~267 mg Na/g.</p>
+        <p><strong>Cloruro de sodio:</strong> sal de mesa pura. Más sodio por gramo (~394 mg/g) pero sabor más agresivo. Más barato.</p>
+        <p>La mezcla 50/50 da el mejor balance sabor/concentración para entrenamientos largos.</p>
+      </div>
+
+      <div class="tip-card">
+        <h3>Cuándo entrenar con cuál</h3>
+        <p><strong>Preset A (high-carb):</strong> entrenamientos largos en bici donde quieres maximizar carbo. Requiere gut training.</p>
+        <p><strong>Preset B (hydration):</strong> sesiones cortas-medias, complemento de geles, días calurosos sin esfuerzo extremo.</p>
+        <p><strong>Preset C (hot):</strong> días &gt;25°C, sudoración alta, simulaciones de carrera en calor.</p>
+      </div>
+
+      <div class="tip-card">
+        <h3>Gut training</h3>
+        <p>La tolerancia a alta concentración se entrena. El intestino se adapta a procesar más carbos con exposición repetida.</p>
+        <p>Para empujar &gt;80 g/h con drink mix: <strong>8-10 semanas</strong> de adaptación. Empieza al 8-10% concentración y sube 2% cada 2 semanas. Mínimo 2 sesiones/semana con carga.</p>
+      </div>
+
+      <div class="tip-card">
+        <h3>Drink mix vs gel</h3>
+        <p>En bici, drink mix de alta concentración puede reemplazar geles si tienes la tolerancia. Más simple, menos sachets que abrir.</p>
+        <p>En carrera, los geles funcionan mejor (menos volumen en estómago, menos sloshing). Drink mix en carrera solo si vas con cinturón de hidratación.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ LOTES ============ -->
+  <section class="panel" id="panel-batches">
+    <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 4px;">Lotes guardados</h2>
+        <p style="color: var(--ink-soft); font-size: 14px;">Registra tus experimentos. Compara dos lotes lado a lado.</p>
+      </div>
+    </div>
+
+    <div class="compare-bar" id="compareBar" style="display:none;">
+      <span id="compareBarText">Selecciona 2 lotes para comparar</span>
+      <div>
+        <button id="compareBtn" disabled>Comparar</button>
+        <button id="cancelCompare" style="margin-left:8px;">Cancelar</button>
+      </div>
+    </div>
+
+    <div id="compareView"></div>
+
+    <div id="batchesList"></div>
+  </section>
+
+</main>
+
+<div class="toast" id="toast">Lote guardado</div>
+
+<script>
+// ============ CONSTANTS ============
+const PRESETS = {
+  A: { name: 'High-carb', volume: 500, carbs: 80, ratio: 1.30, sodium: 290, sodiumSource: 'citrate', potassium: 0, citric: 0.4, caffeine: 0 },
+  B: { name: 'Hydration', volume: 500, carbs: 28, ratio: 1.80, sodium: 665, sodiumSource: 'mix', potassium: 115, citric: 0.3, caffeine: 0 },
+  C: { name: 'Hot', volume: 500, carbs: 50, ratio: 1.30, sodium: 800, sodiumSource: 'mix', potassium: 150, citric: 0.3, caffeine: 0 }
+};
+
+const NA_PER_G = { citrate: 267, chloride: 394, mix: 330 };
+const K_PER_G = 381;
+
+const COSTS = {
+  maltodextrin: 5,
+  fructose: 8,
+  sodiumCitrate: 5,
+  sodiumChloride: 0.5,
+  potassiumCitrate: 30,
+  citricAcid: 10,
+  caffeine: 1000,
+  sachet: 65
+};
+
+const COMMERCIAL = [
+  { name: 'Maurten Drink Mix 320', price: 6500, carbs: 79 },
+  { name: 'SiS Beta Fuel', price: 4500, carbs: 80 },
+  { name: 'Precision PF 30', price: 3500, carbs: 30 }
+];
+
+let state = {
+  preset: 'A',
+  volume: 500,
+  carbs: 80,
+  ratio: 1.30,
+  sodium: 290,
+  sodiumSource: 'citrate',
+  potassium: 0,
+  citric: 0.4,
+  caffeine: 0,
+  notes: ''
+};
+
+let savedBatches = [];
+let compareMode = false;
+let selectedForCompare = [];
+
+// ============ CALCULATION ============
+function calculate() {
+  const r = state.ratio;
+  const malto = state.carbs * r / (r + 1);
+  const fructose = state.carbs / (r + 1);
+
+  let sodiumCitrateG = 0, sodiumChlorideG = 0;
+  if (state.sodiumSource === 'citrate') {
+    sodiumCitrateG = state.sodium / NA_PER_G.citrate;
+  } else if (state.sodiumSource === 'chloride') {
+    sodiumChlorideG = state.sodium / NA_PER_G.chloride;
+  } else {
+    sodiumCitrateG = (state.sodium / 2) / NA_PER_G.citrate;
+    sodiumChlorideG = (state.sodium / 2) / NA_PER_G.chloride;
+  }
+
+  const potassiumCitrateG = state.potassium / K_PER_G;
+  const citricG = state.citric;
+  const caffeineG = state.caffeine / 1000;
+
+  const concentration = (state.carbs / state.volume) * 100;
+  const sodiumPerL = (state.sodium / state.volume) * 1000;
+
+  const cost = Math.round(
+    malto * COSTS.maltodextrin +
+    fructose * COSTS.fructose +
+    sodiumCitrateG * COSTS.sodiumCitrate +
+    sodiumChlorideG * COSTS.sodiumChloride +
+    potassiumCitrateG * COSTS.potassiumCitrate +
+    citricG * COSTS.citricAcid +
+    caffeineG * COSTS.caffeine +
+    COSTS.sachet
+  );
+
+  return { malto, fructose, sodiumCitrateG, sodiumChlorideG, potassiumCitrateG, citricG, caffeineG, concentration, sodiumPerL, cost };
+}
+
+function getTonicityClass(conc) {
+  if (conc < 5.6) return { label: 'Hipotónica', cls: 'stat-tag' };
+  if (conc <= 8) return { label: 'Isotónica', cls: 'stat-tag' };
+  if (conc <= 12) return { label: 'Hipertónica leve', cls: 'stat-tag warn' };
+  return { label: 'Hipertónica', cls: 'stat-tag warn' };
+}
+
+// ============ RENDER ============
+function render() {
+  const c = calculate();
+
+  document.getElementById('outCarbs').textContent = state.carbs;
+  document.getElementById('outConc').textContent = c.concentration.toFixed(1);
+  document.getElementById('outSod').textContent = state.sodium;
+  document.getElementById('outSodL').textContent = Math.round(c.sodiumPerL);
+  document.getElementById('outCost').textContent = c.cost.toLocaleString('es-CL');
+
+  const tonicity = getTonicityClass(c.concentration);
+  document.getElementById('concTag').innerHTML = `<span class="${tonicity.cls}">${tonicity.label}</span>`;
+  document.getElementById('outCarbHr').textContent = `→ ${state.carbs} g/h a 1 botella/h`;
+
+  const presetCode = state.preset === 'custom' ? 'CUSTOM' : state.preset;
+  document.getElementById('recipeRef').textContent = `REF / ${presetCode}-${String(state.carbs).padStart(3,'0')}`;
+
+  // Ingredients table
+  const rows = [];
+  if (c.malto > 0) rows.push(['Maltodextrina', 'Carbo base', c.malto, 'g']);
+  if (c.fructose > 0) rows.push(['Fructosa cristalina', 'Carbo secundario', c.fructose, 'g']);
+  if (c.sodiumCitrateG > 0) rows.push(['Citrato de sodio', 'Electrolito · buffer', c.sodiumCitrateG, 'g']);
+  if (c.sodiumChlorideG > 0) rows.push(['Cloruro de sodio', 'Electrolito', c.sodiumChlorideG, 'g']);
+  if (c.potassiumCitrateG > 0) rows.push(['Citrato de potasio', 'Electrolito', c.potassiumCitrateG, 'g']);
+  if (c.citricG > 0) rows.push(['Ácido cítrico', 'Sabor · pH', c.citricG, 'g']);
+  if (c.caffeineG > 0) rows.push(['Cafeína anhidra', 'Ergogénico', state.caffeine, 'mg']);
+
+  document.getElementById('ingredientsBody').innerHTML = rows.map(r => {
+    const val = r[3] === 'mg' ? r[2].toFixed(0) : r[2].toFixed(2);
+    return `<tr><td class="ingredient">${r[0]}</td><td class="role">${r[1]}</td><td class="num">${val} ${r[3]}</td></tr>`;
+  }).join('');
+
+  // Commercial comparison
+  document.getElementById('commercialComp').innerHTML = COMMERCIAL.map(comm => {
+    const equivCost = comm.price * (state.carbs / comm.carbs);
+    const savings = Math.round(((equivCost - c.cost) / equivCost) * 100);
+    return `<div class="comp-row"><span class="comp-label">vs ${comm.name}</span><span class="comp-savings">−${savings}%</span></div>`;
+  }).join('');
+
+  renderLote(c);
+}
+
+function renderLote(c) {
+  const n = parseInt(document.getElementById('loteN').value) || 1;
+  const rows = [];
+  if (c.malto > 0) rows.push(['Maltodextrina', c.malto * n, 'g']);
+  if (c.fructose > 0) rows.push(['Fructosa cristalina', c.fructose * n, 'g']);
+  if (c.sodiumCitrateG > 0) rows.push(['Citrato de sodio', c.sodiumCitrateG * n, 'g']);
+  if (c.sodiumChlorideG > 0) rows.push(['Cloruro de sodio', c.sodiumChlorideG * n, 'g']);
+  if (c.potassiumCitrateG > 0) rows.push(['Citrato de potasio', c.potassiumCitrateG * n, 'g']);
+  if (c.citricG > 0) rows.push(['Ácido cítrico', c.citricG * n, 'g']);
+  if (c.caffeineG > 0) rows.push(['Cafeína', state.caffeine * n, 'mg']);
+  rows.push(['Sachets', n, 'ud']);
+
+  document.getElementById('loteTable').innerHTML = rows.map(r => {
+    const val = r[2] === 'mg' || r[2] === 'ud' ? r[1].toFixed(0) : r[1].toFixed(1);
+    return `<tr><td>${r[0]}</td><td>${val} ${r[2]}</td></tr>`;
+  }).join('');
+  document.getElementById('loteCost').textContent = (c.cost * n).toLocaleString('es-CL');
+}
+
+// ============ PRESET / VOLUME ============
+function applyPreset(key) {
+  if (key === 'custom') {
+    state.preset = 'custom';
+  } else {
+    state = { ...state, ...PRESETS[key], preset: key, notes: state.notes };
+  }
+  syncInputsToState();
+  document.querySelectorAll('[data-preset]').forEach(b => b.classList.toggle('active', b.dataset.preset === key));
+  document.querySelectorAll('[data-volume]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.volume) === state.volume));
+  saveState();
+  render();
+}
+
+function syncInputsToState() {
+  const map = [
+    ['carbs', state.carbs, 0],
+    ['ratio', state.ratio, 2],
+    ['sodium', state.sodium, 0],
+    ['potassium', state.potassium, 0],
+    ['citric', state.citric, 1],
+    ['caffeine', state.caffeine, 0]
+  ];
+  map.forEach(([id, val, dec]) => {
+    document.getElementById(id).value = val;
+    document.getElementById(id + '_input').value = dec > 0 ? val.toFixed(dec) : val;
+  });
+  document.getElementById('sodiumSource').value = state.sodiumSource;
+  document.getElementById('notes').value = state.notes;
+}
+
+function markCustomIfChanged() {
+  const current = state.preset;
+  if (current === 'custom') return;
+  const p = PRESETS[current];
+  if (!p) return;
+  const keys = ['volume','carbs','ratio','sodium','sodiumSource','potassium','citric','caffeine'];
+  for (const k of keys) {
+    if (Math.abs((typeof state[k] === 'number' ? state[k] : 0) - (typeof p[k] === 'number' ? p[k] : 0)) > 0.001 && state[k] !== p[k]) {
+      state.preset = 'custom';
+      document.querySelectorAll('[data-preset]').forEach(b => b.classList.toggle('active', b.dataset.preset === 'custom'));
+      return;
+    }
+  }
+}
+
+// ============ RANGE + INPUT BIND ============
+function bindRangeInput(key, isFloat, decimals) {
+  const range = document.getElementById(key);
+  const input = document.getElementById(key + '_input');
+
+  const update = (val, source) => {
+    let v = isFloat ? parseFloat(val) : parseInt(val);
+    if (isNaN(v)) return;
+    const min = parseFloat(range.min);
+    const max = parseFloat(range.max);
+    if (v < min) v = min;
+    if (v > max) v = max;
+    state[key] = v;
+    if (source !== 'range') range.value = v;
+    if (source !== 'input') input.value = decimals > 0 ? v.toFixed(decimals) : v;
+    markCustomIfChanged();
+    saveState();
+    render();
+  };
+
+  range.addEventListener('input', e => update(e.target.value, 'range'));
+  input.addEventListener('input', e => {
+    // Allow free typing without clamping mid-edit
+    let v = isFloat ? parseFloat(e.target.value) : parseInt(e.target.value);
+    if (isNaN(v)) return;
+    state[key] = v;
+    range.value = v;
+    markCustomIfChanged();
+    saveState();
+    render();
+  });
+  input.addEventListener('blur', e => {
+    let v = isFloat ? parseFloat(e.target.value) : parseInt(e.target.value);
+    if (isNaN(v)) v = state[key];
+    update(v, null);
+  });
+}
+
+// ============ EVENTS ============
+function attachEvents() {
+  document.querySelectorAll('[data-preset]').forEach(btn => {
+    btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
+  });
+  document.querySelectorAll('[data-volume]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.volume = parseInt(btn.dataset.volume);
+      document.querySelectorAll('[data-volume]').forEach(b => b.classList.toggle('active', b === btn));
+      markCustomIfChanged();
+      saveState();
+      render();
+    });
+  });
+
+  bindRangeInput('carbs', false, 0);
+  bindRangeInput('ratio', true, 2);
+  bindRangeInput('sodium', false, 0);
+  bindRangeInput('potassium', false, 0);
+  bindRangeInput('citric', true, 1);
+  bindRangeInput('caffeine', false, 0);
+
+  document.getElementById('sodiumSource').addEventListener('change', e => {
+    state.sodiumSource = e.target.value;
+    markCustomIfChanged();
+    saveState();
+    render();
+  });
+  document.getElementById('notes').addEventListener('input', e => {
+    state.notes = e.target.value;
+    saveState();
+  });
+  document.getElementById('loteN').addEventListener('input', () => render());
+  document.getElementById('saveBatch').addEventListener('click', saveBatch);
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+  });
+  document.getElementById('cancelCompare').addEventListener('click', () => {
+    compareMode = false;
+    selectedForCompare = [];
+    document.getElementById('compareBar').style.display = 'none';
+    document.getElementById('compareView').innerHTML = '';
+    renderBatches();
+  });
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === `panel-${tab}`));
+  if (tab === 'batches') renderBatches();
+}
+
+// ============ STORAGE ============
+function saveState() {
+  try { localStorage.setItem('dm_currentState', JSON.stringify(state)); } catch(e) {}
+}
+function loadState() {
+  try {
+    const s = localStorage.getItem('dm_currentState');
+    if (s) state = { ...state, ...JSON.parse(s) };
+  } catch(e) {}
+}
+function loadBatches() {
+  try {
+    const b = localStorage.getItem('dm_batches');
+    if (b) savedBatches = JSON.parse(b);
+  } catch(e) { savedBatches = []; }
+  updateBatchCount();
+}
+function persistBatches() {
+  try { localStorage.setItem('dm_batches', JSON.stringify(savedBatches)); } catch(e) {}
+  updateBatchCount();
+}
+function updateBatchCount() {
+  document.getElementById('batchCount').textContent = savedBatches.length > 0 ? `· ${savedBatches.length}` : '';
+}
+function saveBatch() {
+  const nameInput = document.getElementById('batchName');
+  const name = nameInput.value.trim() || `Lote ${savedBatches.length + 1}`;
+  const c = calculate();
+  savedBatches.unshift({
+    id: Date.now(),
+    name,
+    state: { ...state },
+    calc: { concentration: c.concentration, sodiumPerL: c.sodiumPerL, cost: c.cost },
+    savedAt: new Date().toISOString()
+  });
+  persistBatches();
+  nameInput.value = '';
+  showToast(`Guardado: ${name}`);
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ============ BATCHES UI ============
+function renderBatches() {
+  const container = document.getElementById('batchesList');
+  if (savedBatches.length === 0) {
+    container.innerHTML = `<div class="empty-state"><p>Sin lotes guardados · Configura un lote en la calculadora y presiona "Guardar"</p></div>`;
+    document.getElementById('compareBar').style.display = 'none';
+    return;
+  }
+
+  container.innerHTML = savedBatches.map(b => {
+    const presetLabel = b.state.preset === 'custom' ? 'CUSTOM' : b.state.preset;
+    const checked = selectedForCompare.includes(b.id) ? 'checked' : '';
+    return `
+    <div class="saved-batch">
+      <div class="batch-info">
+        <h4>
+          ${compareMode ? `<input type="checkbox" class="batch-checkbox" data-id="${b.id}" ${checked}>` : ''}
+          <span class="batch-preset">${presetLabel}</span>
+          ${b.name}
+        </h4>
+        <div class="batch-stats">${b.state.carbs}g carbos · ${b.state.volume}ml · ${b.calc.concentration.toFixed(1)}% · ${b.state.sodium}mg Na · $${b.calc.cost.toLocaleString('es-CL')} CLP</div>
+        ${b.state.notes ? `<div class="batch-notes">${b.state.notes}</div>` : ''}
+      </div>
+      <div class="batch-actions">
+        <button data-action="load" data-id="${b.id}">Cargar</button>
+        <button data-action="delete" data-id="${b.id}" class="danger">Eliminar</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  if (savedBatches.length >= 2) {
+    const bar = document.getElementById('compareBar');
+    bar.style.display = 'flex';
+    document.getElementById('compareBarText').textContent = compareMode ?
+      `${selectedForCompare.length} de 2 lotes seleccionados` :
+      'Activa modo comparar para seleccionar 2 lotes';
+    const cBtn = document.getElementById('compareBtn');
+    cBtn.disabled = compareMode && selectedForCompare.length !== 2;
+    cBtn.textContent = compareMode ? 'Comparar' : 'Activar modo comparar';
+    cBtn.onclick = compareMode ? renderCompareView : () => { compareMode = true; renderBatches(); };
+  }
+
+  container.querySelectorAll('button[data-action]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = parseInt(btn.dataset.id);
+      if (btn.dataset.action === 'load') loadBatch(id);
+      else deleteBatch(id);
+    });
+  });
+  container.querySelectorAll('.batch-checkbox').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const id = parseInt(cb.dataset.id);
+      if (cb.checked) {
+        if (selectedForCompare.length >= 2) { cb.checked = false; showToast('Máximo 2 lotes'); return; }
+        selectedForCompare.push(id);
+      } else {
+        selectedForCompare = selectedForCompare.filter(x => x !== id);
+      }
+      renderBatches();
+    });
+  });
+}
+
+function loadBatch(id) {
+  const batch = savedBatches.find(b => b.id === id);
+  if (!batch) return;
+  state = { ...batch.state };
+  syncInputsToState();
+  document.querySelectorAll('[data-preset]').forEach(b => b.classList.toggle('active', b.dataset.preset === state.preset));
+  document.querySelectorAll('[data-volume]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.volume) === state.volume));
+  saveState();
+  render();
+  switchTab('calc');
+  showToast(`Cargado: ${batch.name}`);
+}
+function deleteBatch(id) {
+  const batch = savedBatches.find(b => b.id === id);
+  if (!batch) return;
+  if (!confirm(`¿Eliminar "${batch.name}"?`)) return;
+  savedBatches = savedBatches.filter(b => b.id !== id);
+  selectedForCompare = selectedForCompare.filter(x => x !== id);
+  persistBatches();
+  renderBatches();
+  showToast('Lote eliminado');
+}
+
+function renderCompareView() {
+  if (selectedForCompare.length !== 2) return;
+  const batches = selectedForCompare.map(id => savedBatches.find(b => b.id === id));
+  const view = document.getElementById('compareView');
+  view.innerHTML = `<div class="compare-view" style="grid-template-columns: 1fr 1fr;">
+    ${batches.map(b => `
+      <div class="compare-col">
+        <h4>${b.name}</h4>
+        <div class="meta">${b.state.preset.toUpperCase()} · ${new Date(b.savedAt).toLocaleDateString('es-CL')}</div>
+        <table>
+          <tr><th>Volumen</th><td class="num">${b.state.volume} ml</td></tr>
+          <tr><th>Carbos</th><td class="num">${b.state.carbs} g</td></tr>
+          <tr><th>Concentración</th><td class="num">${b.calc.concentration.toFixed(1)}%</td></tr>
+          <tr><th>Ratio</th><td class="num">${b.state.ratio.toFixed(2)}:1</td></tr>
+          <tr><th>Sodio</th><td class="num">${b.state.sodium} mg</td></tr>
+          <tr><th>Sodio /L</th><td class="num">${Math.round(b.calc.sodiumPerL)} mg/L</td></tr>
+          <tr><th>Potasio</th><td class="num">${b.state.potassium} mg</td></tr>
+          <tr><th>Cafeína</th><td class="num">${b.state.caffeine} mg</td></tr>
+          <tr><th>Costo</th><td class="num">$${b.calc.cost.toLocaleString('es-CL')}</td></tr>
+        </table>
+        ${b.state.notes ? `<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--hairline);font-size:12px;color:var(--ink-soft);"><strong>Notas:</strong> ${b.state.notes}</div>` : ''}
+      </div>`).join('')}
+  </div>`;
+}
+
+// ============ INIT ============
+function init() {
+  loadState();
+  loadBatches();
+  syncInputsToState();
+  document.querySelectorAll('[data-preset]').forEach(b => b.classList.toggle('active', b.dataset.preset === state.preset));
+  document.querySelectorAll('[data-volume]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.volume) === state.volume));
+  attachEvents();
+  render();
+}
+init();
+</script>
+
+</body>
+</html>
