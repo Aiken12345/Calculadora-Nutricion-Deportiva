@@ -12,8 +12,7 @@ const PRICES = {
   potassiumCitrate: 22,     // mmpp.cl · Citrato de potasio 250g $5.500
   citricAcid: 9,            // mmpp.cl · Ácido cítrico 500g $4.500
   calciumLactate: 26,       // mmpp.cl · Lactato de calcio 250g $6.500
-  caffeine: 140,            // mmpp.cl · Cafeína anhidra 100g $14.000
-  sachet: 65                // packaging, no es insumo mmpp.cl
+  caffeine: 140             // mmpp.cl · Cafeína anhidra 100g $14.000
 };
 const PRICES_UPDATED = 'jul-2026';
 
@@ -27,8 +26,7 @@ const INGREDIENT_INFO = [
   { key: 'citricAcid',      name: 'Ácido cítrico',                  package: '500 g', packagePrice: 4500,  source: 'mmpp.cl' },
   { key: 'calciumLactate',  name: 'Lactato de calcio',              package: '250 g', packagePrice: 6500,  source: 'mmpp.cl' },
   { key: 'caffeine',        name: 'Cafeína anhidra',                package: '100 g', packagePrice: 14000, source: 'mmpp.cl' },
-  { key: 'sodiumChloride',  name: 'Cloruro de sodio (sal de mesa)', package: '—',     packagePrice: null,  source: 'No vendido en mmpp.cl · precio/g referencial sin verificar' },
-  { key: 'sachet',          name: 'Sachet / envase',                package: '1 ud',  packagePrice: 65,    source: 'Estimado propio, no es insumo mmpp.cl', perUnit: true }
+  { key: 'sodiumChloride',  name: 'Cloruro de sodio (sal de mesa)', package: '—',     packagePrice: null,  source: 'No vendido en mmpp.cl · precio/g referencial sin verificar' }
 ];
 
 function renderInsumosTable(tbodyId) {

@@ -292,7 +292,7 @@
       <div class="stat-card">
         <div class="stat-label">Costo unidad</div>
         <div class="stat-value">$<span id="costOutCost">605</span><span class="stat-unit">CLP</span></div>
-        <div class="stat-sub">ingredientes + sachet</div>
+        <div class="stat-sub">solo ingredientes</div>
       </div>
     </div>
 
@@ -546,8 +546,7 @@ function calculate() {
     sodiumChlorideG * PRICES.sodiumChloride +
     potassiumCitrateG * PRICES.potassiumCitrate +
     citricG * PRICES.citricAcid +
-    caffeineG * PRICES.caffeine +
-    PRICES.sachet
+    caffeineG * PRICES.caffeine
   );
 
   return { malto, fructose, sodiumCitrateG, sodiumChlorideG, potassiumCitrateG, citricG, caffeineG, concentration, sodiumPerL, cost };
@@ -617,12 +616,6 @@ function renderCosts(c) {
       <td class="num">$${Math.round(qty * price).toLocaleString('es-CL')}</td>
     </tr>`).join('');
   rowsHtml += `
-    <tr>
-      <td class="ingredient">Sachet</td>
-      <td class="num">1 ud</td>
-      <td class="num">—</td>
-      <td class="num">$${PRICES.sachet.toLocaleString('es-CL')}</td>
-    </tr>
     <tr class="cost-total-row">
       <td class="ingredient">Total</td>
       <td></td>
