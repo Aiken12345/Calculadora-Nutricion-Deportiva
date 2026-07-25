@@ -27,6 +27,8 @@
   <button class="tab-btn active" data-tab="calc">Calculadora</button>
   <button class="tab-btn" data-tab="prep">Preparación</button>
   <button class="tab-btn" data-tab="costos">Costos</button>
+  <button class="tab-btn" data-tab="comparacion">Comparación</button>
+  <button class="tab-btn" data-tab="insumos">Insumos</button>
   <button class="tab-btn" data-tab="bitacora">Bitácora</button>
   <button class="tab-btn" data-tab="science">Ciencia</button>
   <button class="tab-btn" data-tab="batches">Lotes <span id="batchCount" style="opacity:0.5;"></span></button>
@@ -283,7 +285,7 @@
   <section class="panel" id="panel-costos">
     <div style="margin-bottom: 24px;">
       <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">Costos del drink mix</h2>
-      <p style="color: var(--ink-soft); font-size: 14px;">Desglose de costo por insumo y comparación contra productos comerciales.</p>
+      <p style="color: var(--ink-soft); font-size: 14px;">Desglose de costo por insumo de tu receta actual.</p>
     </div>
 
     <div class="stats-grid" style="grid-template-columns: 1fr; max-width: 260px;">
@@ -293,9 +295,6 @@
         <div class="stat-sub">ingredientes + sachet</div>
       </div>
     </div>
-
-    <div class="subsection-label" style="margin-top:0;">Comparativa comercial</div>
-    <div id="commercialComp" style="margin-bottom:20px;"></div>
 
     <div class="table-wrap">
       <div class="table-header">
@@ -318,6 +317,46 @@
     <div class="lote-cost-line">
       <span class="label">Costo lote actual (<span id="loteCostN">10</span> sachets)</span>
       <span class="value">$<span id="loteCost">6050</span> CLP</span>
+    </div>
+  </section>
+
+  <!-- ============ COMPARACIÓN ============ -->
+  <section class="panel" id="panel-comparacion">
+    <div style="margin-bottom: 24px;">
+      <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">Comparación de precios</h2>
+      <p style="color: var(--ink-soft); font-size: 14px;">Zona de experimentación: agrega hasta 5 productos comerciales con el precio que tú ingreses (ej: 1 sachet individual) y compáralos contra tu costo por sachet actual.</p>
+    </div>
+
+    <form class="comparison-form" id="comparisonForm">
+      <input type="text" id="cmpName" placeholder="Nombre (ej: Maurten Drink Mix 320)">
+      <input type="number" id="cmpPrice" placeholder="Precio CLP" min="0" step="1">
+      <button type="submit" class="btn">Agregar</button>
+    </form>
+    <div class="prices-footnote" id="cmpLimitNote" style="display:none;">Máximo 5 productos · elimina uno para agregar otro.</div>
+
+    <div id="comparisonList"></div>
+  </section>
+
+  <!-- ============ INSUMOS ============ -->
+  <section class="panel" id="panel-insumos">
+    <div style="margin-bottom: 24px;">
+      <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">Lista de precios de insumos</h2>
+      <p style="color: var(--ink-soft); font-size: 14px;">Precio de referencia por presentación de cada materia prima, según mmpp.cl (actualizado jul-2026). Se comparte con la calculadora de gel.</p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Insumo</th>
+            <th class="right">Presentación</th>
+            <th class="right">Precio presentación</th>
+            <th class="right">Precio/g</th>
+            <th>Fuente</th>
+          </tr>
+        </thead>
+        <tbody id="insumosBody"></tbody>
+      </table>
     </div>
   </section>
 
@@ -452,12 +491,7 @@ const NA_PER_G = { citrate: 267, chloride: 394, mix: 330 };
 const K_PER_G = 381;
 
 // Precios de insumos: ver PRICES en shared.js (mmpp.cl)
-
-const COMMERCIAL = [
-  { name: 'Maurten Drink Mix 320', price: 6500, carbs: 79 },
-  { name: 'SiS Beta Fuel', price: 4500, carbs: 80 },
-  { name: 'Precision PF 30', price: 3500, carbs: 30 }
-];
+// Comparación con productos comerciales: ver pestaña Comparación (manual, ver DM_COMPARISON_SEED más abajo)
 
 let state = {
   preset: 'A',
@@ -475,6 +509,12 @@ let state = {
 let savedBatches = [];
 let compareMode = false;
 let selectedForCompare = [];
+let comparisonCtl = null;
+const DM_COMPARISON_SEED = [
+  { id: 1, name: 'Maurten Drink Mix 320', price: 6500 },
+  { id: 2, name: 'SiS Beta Fuel', price: 4500 },
+  { id: 3, name: 'Precision PF 30', price: 3500 }
+];
 
 // ============ CALCULATION ============
 function calculate() {
@@ -558,12 +598,7 @@ function render() {
 // ============ COSTOS (panel separado) ============
 function renderCosts(c) {
   document.getElementById('costOutCost').textContent = c.cost.toLocaleString('es-CL');
-
-  document.getElementById('commercialComp').innerHTML = COMMERCIAL.map(comm => {
-    const equivCost = comm.price * (state.carbs / comm.carbs);
-    const savings = Math.round(((equivCost - c.cost) / equivCost) * 100);
-    return `<div class="comp-row"><span class="comp-label">vs ${comm.name}</span><span class="comp-savings">−${savings}%</span></div>`;
-  }).join('');
+  if (comparisonCtl) comparisonCtl.refreshSavings(c.cost);
 
   const breakdown = [];
   if (c.malto > 0) breakdown.push(['Maltodextrina', c.malto, PRICES.maltodextrin, false]);
@@ -927,6 +962,19 @@ function initBitacora() {
   });
 }
 
+// ============ COMPARACIÓN INIT ============
+function initComparison() {
+  comparisonCtl = renderComparisonPanel({
+    storageKey: 'dm_comparisons',
+    seed: DM_COMPARISON_SEED,
+    listEl: document.getElementById('comparisonList'),
+    formEl: document.getElementById('comparisonForm'),
+    nameEl: document.getElementById('cmpName'),
+    priceEl: document.getElementById('cmpPrice'),
+    limitNoteEl: document.getElementById('cmpLimitNote')
+  });
+}
+
 // ============ INIT ============
 function init() {
   loadState();
@@ -935,8 +983,10 @@ function init() {
   document.querySelectorAll('[data-preset]').forEach(b => b.classList.toggle('active', b.dataset.preset === state.preset));
   document.querySelectorAll('[data-volume]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.volume) === state.volume));
   attachEvents();
-  render();
+  initComparison();
   initBitacora();
+  renderInsumosTable('insumosBody');
+  render();
 }
 init();
 </script>

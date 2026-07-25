@@ -27,6 +27,8 @@
   <button class="tab-btn active" data-tab="calc">Calculadora</button>
   <button class="tab-btn" data-tab="prep">Preparación</button>
   <button class="tab-btn" data-tab="costos">Costos</button>
+  <button class="tab-btn" data-tab="comparacion">Comparación</button>
+  <button class="tab-btn" data-tab="insumos">Insumos</button>
   <button class="tab-btn" data-tab="bitacora">Bitácora</button>
   <button class="tab-btn" data-tab="science">Ciencia</button>
   <button class="tab-btn" data-tab="batches">Lotes <span id="batchCount" style="opacity:0.5;"></span></button>
@@ -376,19 +378,14 @@
   <section class="panel" id="panel-costos">
     <div style="margin-bottom: 24px;">
       <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">Costos del gel</h2>
-      <p style="color: var(--ink-soft); font-size: 14px;">Desglose de costo por insumo y comparación contra gel comercial.</p>
+      <p style="color: var(--ink-soft); font-size: 14px;">Desglose de costo por insumo de tu receta actual.</p>
     </div>
 
-    <div class="stats-grid">
+    <div class="stats-grid" style="grid-template-columns: 1fr; max-width: 260px;">
       <div class="stat-card">
         <div class="stat-label">Costo por gel</div>
         <div class="stat-value">$<span id="costOutCost">212</span><span class="stat-unit">CLP</span></div>
         <div class="stat-sub">ingredientes + sachet</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Ahorro vs comercial</div>
-        <div class="stat-value"><span id="costOutSavings">91</span><span class="stat-unit">%</span></div>
-        <div class="stat-sub">vs Maurten gel ~$2.500</div>
       </div>
     </div>
 
@@ -413,6 +410,46 @@
     <div class="lote-cost-line">
       <span class="label">Costo lote actual (<span id="loteCostN">10</span> geles)</span>
       <span class="value">$<span id="loteCost">2120</span> CLP</span>
+    </div>
+  </section>
+
+  <!-- ============ COMPARACIÓN ============ -->
+  <section class="panel" id="panel-comparacion">
+    <div style="margin-bottom: 24px;">
+      <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">Comparación de precios</h2>
+      <p style="color: var(--ink-soft); font-size: 14px;">Zona de experimentación: agrega hasta 5 productos comerciales con el precio que tú ingreses (ej: 1 gel individual) y compáralos contra tu costo por gel actual.</p>
+    </div>
+
+    <form class="comparison-form" id="comparisonForm">
+      <input type="text" id="cmpName" placeholder="Nombre (ej: Maurten Gel 100)">
+      <input type="number" id="cmpPrice" placeholder="Precio CLP" min="0" step="1">
+      <button type="submit" class="btn">Agregar</button>
+    </form>
+    <div class="prices-footnote" id="cmpLimitNote" style="display:none;">Máximo 5 productos · elimina uno para agregar otro.</div>
+
+    <div id="comparisonList"></div>
+  </section>
+
+  <!-- ============ INSUMOS ============ -->
+  <section class="panel" id="panel-insumos">
+    <div style="margin-bottom: 24px;">
+      <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">Lista de precios de insumos</h2>
+      <p style="color: var(--ink-soft); font-size: 14px;">Precio de referencia por presentación de cada materia prima, según mmpp.cl (actualizado jul-2026). Se comparte con la calculadora de drink mix.</p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Insumo</th>
+            <th class="right">Presentación</th>
+            <th class="right">Precio presentación</th>
+            <th class="right">Precio/g</th>
+            <th>Fuente</th>
+          </tr>
+        </thead>
+        <tbody id="insumosBody"></tbody>
+      </table>
     </div>
   </section>
 
@@ -551,8 +588,7 @@ const CITRIC_PER_CARB = 0.00667; // 0.2g per 30g carb
 const NA_PER_G_CITRATE = 267;
 
 // Precios de insumos: ver PRICES en shared.js (mmpp.cl)
-
-const COMMERCIAL_GEL_PRICE = 2500; // CLP per Maurten-like gel
+// Comparación con productos comerciales: ver pestaña Comparación (manual, ver GEL_COMPARISON_SEED más abajo)
 
 let state = {
   mode: 'quantity', // 'quantity' or 'activity'
@@ -575,6 +611,10 @@ let state = {
 let savedBatches = [];
 let compareMode = false;
 let selectedForCompare = [];
+let comparisonCtl = null;
+const GEL_COMPARISON_SEED = [
+  { id: 1, name: 'Maurten Gel 100', price: 2500 }
+];
 
 // ============ CALCULATION ============
 function calculate() {
@@ -604,9 +644,7 @@ function calculate() {
     PRICES.sachet
   );
 
-  const savings = Math.round(((COMMERCIAL_GEL_PRICE - cost) / COMMERCIAL_GEL_PRICE) * 100);
-
-  return { malto, fructose, pectin, water, calciumLactate, citricAcid, sodiumCitrate, caffeineG, weight, cost, savings };
+  return { malto, fructose, pectin, water, calciumLactate, citricAcid, sodiumCitrate, caffeineG, weight, cost };
 }
 
 function calculateNGeles() {
@@ -702,7 +740,7 @@ function render() {
 // ============ COSTOS (panel separado) ============
 function renderCosts(c) {
   document.getElementById('costOutCost').textContent = c.cost.toLocaleString('es-CL');
-  document.getElementById('costOutSavings').textContent = c.savings;
+  if (comparisonCtl) comparisonCtl.refreshSavings(c.cost);
 
   const breakdown = [];
   if (c.malto > 0) breakdown.push(['Maltodextrina', c.malto, PRICES.maltodextrin]);
@@ -924,7 +962,7 @@ function saveBatch() {
     id: Date.now(),
     name,
     state: { ...state },
-    calc: { weight: c.weight, cost: c.cost, savings: c.savings },
+    calc: { weight: c.weight, cost: c.cost },
     savedAt: new Date().toISOString()
   });
   persistBatches();
@@ -1042,7 +1080,6 @@ function renderCompareView() {
           <tr><th>Sodio</th><td class="num">${b.state.sodium} mg</td></tr>
           <tr><th>Cafeína</th><td class="num">${b.state.caffeine} mg</td></tr>
           <tr><th>Costo/gel</th><td class="num">$${b.calc.cost.toLocaleString('es-CL')}</td></tr>
-          <tr><th>Ahorro</th><td class="num">${b.calc.savings}%</td></tr>
         </table>
         ${b.state.notes ? `<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--hairline);font-size:12px;color:var(--ink-soft);"><strong>Notas:</strong> ${b.state.notes}</div>` : ''}
       </div>`).join('')}
@@ -1065,6 +1102,19 @@ function initBitacora() {
   });
 }
 
+// ============ COMPARACIÓN INIT ============
+function initComparison() {
+  comparisonCtl = renderComparisonPanel({
+    storageKey: 'gel_comparisons',
+    seed: GEL_COMPARISON_SEED,
+    listEl: document.getElementById('comparisonList'),
+    formEl: document.getElementById('comparisonForm'),
+    nameEl: document.getElementById('cmpName'),
+    priceEl: document.getElementById('cmpPrice'),
+    limitNoteEl: document.getElementById('cmpLimitNote')
+  });
+}
+
 // ============ INIT ============
 function init() {
   loadState();
@@ -1074,8 +1124,10 @@ function init() {
   applyActivity(state.activity);
   applyDensity(state.density);
   attachEvents();
-  render();
+  initComparison();
   initBitacora();
+  renderInsumosTable('insumosBody');
+  render();
 }
 init();
 </script>

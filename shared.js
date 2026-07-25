@@ -17,6 +17,137 @@ const PRICES = {
 };
 const PRICES_UPDATED = 'jul-2026';
 
+/* ============ FICHA DE INSUMOS (presentación · precio · fuente) ============ */
+const INGREDIENT_INFO = [
+  { key: 'maltodextrin',    name: 'Maltodextrina',                 package: '1 kg',  packagePrice: 5500,  source: 'mmpp.cl' },
+  { key: 'fructose',        name: 'Fructosa cristalina',           package: '1 kg',  packagePrice: 9900,  source: 'mmpp.cl' },
+  { key: 'pectin',          name: 'Pectina',                       package: '100 g', packagePrice: 6500,  source: 'mmpp.cl' },
+  { key: 'sodiumCitrate',   name: 'Citrato de sodio',               package: '500 g', packagePrice: 7000,  source: 'mmpp.cl' },
+  { key: 'potassiumCitrate',name: 'Citrato de potasio',             package: '250 g', packagePrice: 5500,  source: 'mmpp.cl' },
+  { key: 'citricAcid',      name: 'Ácido cítrico',                  package: '500 g', packagePrice: 4500,  source: 'mmpp.cl' },
+  { key: 'calciumLactate',  name: 'Lactato de calcio',              package: '250 g', packagePrice: 6500,  source: 'mmpp.cl' },
+  { key: 'caffeine',        name: 'Cafeína anhidra',                package: '100 g', packagePrice: 14000, source: 'mmpp.cl' },
+  { key: 'sodiumChloride',  name: 'Cloruro de sodio (sal de mesa)', package: '—',     packagePrice: null,  source: 'No vendido en mmpp.cl · precio/g referencial sin verificar' },
+  { key: 'sachet',          name: 'Sachet / envase',                package: '1 ud',  packagePrice: 65,    source: 'Estimado propio, no es insumo mmpp.cl', perUnit: true }
+];
+
+function renderInsumosTable(tbodyId) {
+  const body = document.getElementById(tbodyId);
+  if (!body) return;
+  body.innerHTML = INGREDIENT_INFO.map(ing => {
+    const priceG = PRICES[ing.key];
+    const unit = ing.perUnit ? '/ud' : '/g';
+    const priceGLabel = typeof priceG === 'number' ? `$${priceG.toLocaleString('es-CL', { maximumFractionDigits: 2 })}${unit}` : '—';
+    const packagePriceLabel = ing.packagePrice != null ? `$${ing.packagePrice.toLocaleString('es-CL')}` : '—';
+    return `
+    <tr>
+      <td class="ingredient">${ing.name}</td>
+      <td class="num">${ing.package}</td>
+      <td class="num">${packagePriceLabel}</td>
+      <td class="num">${priceGLabel}</td>
+      <td class="role">${ing.source}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ============ COMPARACIÓN MANUAL (zona de experimentación, por página) ============ */
+const COMPARISON_MAX = 5;
+
+function loadComparisons(storageKey, seed) {
+  try {
+    const raw = localStorage.getItem(storageKey);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  persistComparisons(storageKey, seed);
+  return seed.slice();
+}
+
+function persistComparisons(storageKey, list) {
+  try { localStorage.setItem(storageKey, JSON.stringify(list)); } catch (e) {}
+}
+
+/**
+ * Pinta y engancha la zona de comparación manual (hasta 5 productos, con memoria en localStorage).
+ * opts: { storageKey, seed, listEl, formEl, nameEl, priceEl, limitNoteEl }
+ * Devuelve { refreshSavings(cost) } — llamar cada vez que cambie el costo propio (dentro de render()).
+ */
+function renderComparisonPanel(opts) {
+  const { storageKey, seed, listEl, formEl, nameEl, priceEl, limitNoteEl } = opts;
+  let items = loadComparisons(storageKey, seed);
+  let lastCost = 0;
+
+  function updateFormState() {
+    const atMax = items.length >= COMPARISON_MAX;
+    formEl.style.display = atMax ? 'none' : '';
+    if (limitNoteEl) limitNoteEl.style.display = atMax ? 'block' : 'none';
+  }
+
+  function renderList() {
+    if (items.length === 0) {
+      listEl.innerHTML = `<div class="empty-state"><p>Sin productos agregados · agrega uno para comparar tu costo</p></div>`;
+    } else {
+      listEl.innerHTML = items.map(it => {
+        const savings = it.price > 0 ? Math.round(((it.price - lastCost) / it.price) * 100) : null;
+        const savingsLabel = savings === null ? '—' : (savings >= 0 ? `−${savings}%` : `+${Math.abs(savings)}%`);
+        const savingsCls = savings !== null && savings < 0 ? 'negative' : '';
+        return `
+        <div class="comparison-row" data-id="${it.id}">
+          <input type="text" class="cmp-name-input" value="${String(it.name).replace(/"/g, '&quot;')}" data-id="${it.id}">
+          <input type="number" class="cmp-price-input" value="${it.price}" min="0" step="1" data-id="${it.id}">
+          <span class="cmp-savings ${savingsCls}">${savingsLabel}</span>
+          <button class="danger cmp-delete" data-id="${it.id}">Eliminar</button>
+        </div>`;
+      }).join('');
+
+      listEl.querySelectorAll('.cmp-name-input').forEach(inp => {
+        inp.addEventListener('change', () => {
+          const id = parseInt(inp.dataset.id);
+          const item = items.find(i => i.id === id);
+          if (item) { item.name = inp.value.trim() || item.name; persistComparisons(storageKey, items); }
+        });
+      });
+      listEl.querySelectorAll('.cmp-price-input').forEach(inp => {
+        inp.addEventListener('change', () => {
+          const id = parseInt(inp.dataset.id);
+          const item = items.find(i => i.id === id);
+          if (item) { item.price = parseFloat(inp.value) || 0; persistComparisons(storageKey, items); renderList(); }
+        });
+      });
+      listEl.querySelectorAll('.cmp-delete').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = parseInt(btn.dataset.id);
+          items = items.filter(i => i.id !== id);
+          persistComparisons(storageKey, items);
+          renderList();
+        });
+      });
+    }
+    updateFormState();
+  }
+
+  renderList();
+
+  formEl.addEventListener('submit', e => {
+    e.preventDefault();
+    if (items.length >= COMPARISON_MAX) return;
+    const name = nameEl.value.trim();
+    const price = parseFloat(priceEl.value);
+    if (!name || !price) return;
+    items.push({ id: Date.now(), name, price });
+    persistComparisons(storageKey, items);
+    nameEl.value = '';
+    priceEl.value = '';
+    renderList();
+  });
+
+  return {
+    refreshSavings(cost) {
+      lastCost = cost;
+      renderList();
+    }
+  };
+}
+
 /* ============ BITÁCORA (compartida vía localStorage) ============ */
 const BITACORA_KEY = 'bitacora_entries';
 

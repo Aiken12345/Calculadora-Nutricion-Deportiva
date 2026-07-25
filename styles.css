@@ -802,6 +802,61 @@ button.btn.secondary:hover { background: #F0EFEA; }
   color: var(--ink);
 }
 
+/* ========== COMPARACIÓN MANUAL ========== */
+.comparison-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.comparison-form input[type="text"] { flex: 1; }
+.comparison-form input[type="number"] { width: 140px; }
+.comparison-row {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-left: 3px solid var(--accent);
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.comparison-row .cmp-name-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 4px 0;
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+.comparison-row .cmp-name-input:focus { box-shadow: none; border-bottom: 1px solid var(--accent); }
+.comparison-row .cmp-price-input {
+  width: 110px;
+  text-align: right;
+  font-weight: 500;
+}
+.comparison-row .cmp-savings {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent);
+  width: 56px;
+  text-align: right;
+}
+.comparison-row .cmp-savings.negative { color: var(--danger); }
+.comparison-row .cmp-delete {
+  padding: 6px 10px;
+  font-size: 10px;
+  background: var(--surface);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.comparison-row .cmp-delete:hover { background: var(--danger-bg); }
+
 /* ========== BITÁCORA ========== */
 .bitacora-form {
   background: var(--surface);
@@ -920,4 +975,8 @@ button.btn.secondary:hover { background: #F0EFEA; }
   .saved-batch { grid-template-columns: 1fr; }
   .stats-grid.cols-3 { grid-template-columns: 1fr; }
   .lote-cost-line { flex-direction: column; gap: 4px; }
+  .comparison-form { flex-direction: column; }
+  .comparison-form input[type="number"] { width: 100%; }
+  .comparison-row { flex-wrap: wrap; }
+  .comparison-row .cmp-name-input { flex-basis: 100%; }
 }
