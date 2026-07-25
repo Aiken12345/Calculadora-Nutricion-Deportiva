@@ -13,7 +13,7 @@
 
 <header>
   <div class="brand">
-    <span>Nutrición Deportiva</span>
+    <a href="index.html">Nutrición Deportiva</a>
     <span class="sep">/</span>
     <span class="sub">Gel</span>
   </div>
@@ -26,6 +26,8 @@
 <nav class="tabs">
   <button class="tab-btn active" data-tab="calc">Calculadora</button>
   <button class="tab-btn" data-tab="prep">Preparación</button>
+  <button class="tab-btn" data-tab="costos">Costos</button>
+  <button class="tab-btn" data-tab="bitacora">Bitácora</button>
   <button class="tab-btn" data-tab="science">Ciencia</button>
   <button class="tab-btn" data-tab="batches">Lotes <span id="batchCount" style="opacity:0.5;"></span></button>
 </nav>
@@ -258,16 +260,6 @@
             <div class="stat-value"><span id="outWeight">49</span><span class="stat-unit">g</span></div>
             <div class="stat-sub" id="outDensityTag"><span class="stat-tag">Denso</span></div>
           </div>
-          <div class="stat-card">
-            <div class="stat-label">Costo por gel</div>
-            <div class="stat-value">$<span id="outCost">212</span><span class="stat-unit">CLP</span></div>
-            <div class="stat-sub">ingredientes + sachet</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Ahorro vs comercial</div>
-            <div class="stat-value"><span id="outSavings">91</span><span class="stat-unit">%</span></div>
-            <div class="stat-sub">vs Maurten gel ~$2.500</div>
-          </div>
         </div>
 
         <!-- Plan 70.3 (solo cuando aplica) -->
@@ -313,10 +305,6 @@
             <span style="font-family: var(--font-mono); font-size: 12px;">geles · cantidades totales:</span>
           </div>
           <table class="lote-table" id="loteTable"></table>
-          <div class="lote-total">
-            <span>Costo total lote</span>
-            <span>$<span id="loteCost">2120</span> CLP</span>
-          </div>
         </div>
 
         <div class="actions">
@@ -384,6 +372,80 @@
     </div>
   </section>
 
+  <!-- ============ COSTOS ============ -->
+  <section class="panel" id="panel-costos">
+    <div style="margin-bottom: 24px;">
+      <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">Costos del gel</h2>
+      <p style="color: var(--ink-soft); font-size: 14px;">Desglose de costo por insumo y comparación contra gel comercial.</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Costo por gel</div>
+        <div class="stat-value">$<span id="costOutCost">212</span><span class="stat-unit">CLP</span></div>
+        <div class="stat-sub">ingredientes + sachet</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Ahorro vs comercial</div>
+        <div class="stat-value"><span id="costOutSavings">91</span><span class="stat-unit">%</span></div>
+        <div class="stat-sub">vs Maurten gel ~$2.500</div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-header">
+        <span class="table-title">Desglose de costo (1 gel)</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Insumo</th>
+            <th class="right">Cantidad</th>
+            <th class="right">Precio/g</th>
+            <th class="right">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody id="costBreakdownBody"></tbody>
+      </table>
+    </div>
+    <div class="prices-footnote">Precios de referencia · mmpp.cl, actualizado jul-2026.</div>
+
+    <div class="lote-cost-line">
+      <span class="label">Costo lote actual (<span id="loteCostN">10</span> geles)</span>
+      <span class="value">$<span id="loteCost">2120</span> CLP</span>
+    </div>
+  </section>
+
+  <!-- ============ BITÁCORA ============ -->
+  <section class="panel" id="panel-bitacora">
+    <div style="margin-bottom: 24px;">
+      <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">Bitácora</h2>
+      <p style="color: var(--ink-soft); font-size: 14px;">Notas de entrenamiento y carrera. Se comparte con la calculadora de drink mix.</p>
+    </div>
+
+    <form class="bitacora-form" id="bitacoraForm">
+      <div>
+        <span class="field-label">Fecha</span>
+        <input type="date" id="bitacoraDate">
+      </div>
+      <div>
+        <span class="field-label">Vincular a lote (opcional)</span>
+        <select id="bitacoraBatch"></select>
+      </div>
+      <div class="full-row">
+        <div>
+          <span class="field-label">Nota</span>
+          <textarea id="bitacoraText" placeholder="ej: gel denso en rodada de 3h, buena tolerancia, subir sodio la próxima vez..."></textarea>
+        </div>
+      </div>
+      <div class="full-row" style="justify-content:flex-end;">
+        <button type="submit" class="btn">Guardar nota</button>
+      </div>
+    </form>
+
+    <div id="bitacoraList"></div>
+  </section>
+
   <!-- ============ CIENCIA ============ -->
   <section class="panel" id="panel-science">
     <div style="margin-bottom: 24px;">
@@ -439,7 +501,6 @@
         <h3>Sin conservante</h3>
         <p>Sin sorbato, consumir dentro de <strong>24h refrigerado</strong>. Preparar la víspera de la carrera o entreno.</p>
         <p>Transportar en bolsa térmica si hace calor. Descartar ante cambio de olor, color o textura.</p>
-        <div class="step-note warn" style="margin-top:8px;font-size:12px;">Para venta comercial agregar sorbato de potasio 0.1% — los 24h no son compatibles con retail.</div>
       </div>
 
       <div class="tip-card">
@@ -476,6 +537,7 @@
 
 <div class="toast" id="toast">Lote guardado</div>
 
+<script src="shared.js"></script>
 <script>
 // ============ CONSTANTS ============
 const DENSITY_FACTORS = {
@@ -488,16 +550,7 @@ const CITRIC_PER_CARB = 0.00667; // 0.2g per 30g carb
 
 const NA_PER_G_CITRATE = 267;
 
-const COSTS = {
-  maltodextrin: 5,
-  fructose: 8,
-  pectin: 48,
-  citricAcid: 10,
-  calciumLactate: 10,
-  sodiumCitrate: 5,
-  caffeine: 1000,
-  sachet: 65
-};
+// Precios de insumos: ver PRICES en shared.js (mmpp.cl)
 
 const COMMERCIAL_GEL_PRICE = 2500; // CLP per Maurten-like gel
 
@@ -541,14 +594,14 @@ function calculate() {
   const weight = malto + fructose + pectin + water + citricAcid + calciumLactate + sodiumCitrate + caffeineG;
 
   const cost = Math.round(
-    malto * COSTS.maltodextrin +
-    fructose * COSTS.fructose +
-    pectin * COSTS.pectin +
-    citricAcid * COSTS.citricAcid +
-    calciumLactate * COSTS.calciumLactate +
-    sodiumCitrate * COSTS.sodiumCitrate +
-    caffeineG * COSTS.caffeine +
-    COSTS.sachet
+    malto * PRICES.maltodextrin +
+    fructose * PRICES.fructose +
+    pectin * PRICES.pectin +
+    citricAcid * PRICES.citricAcid +
+    calciumLactate * PRICES.calciumLactate +
+    sodiumCitrate * PRICES.sodiumCitrate +
+    caffeineG * PRICES.caffeine +
+    PRICES.sachet
   );
 
   const savings = Math.round(((COMMERCIAL_GEL_PRICE - cost) / COMMERCIAL_GEL_PRICE) * 100);
@@ -596,8 +649,6 @@ function render() {
   document.getElementById('outCarbsTotal').textContent = totalCarbs;
   document.getElementById('outNGels').textContent = n;
   document.getElementById('outWeight').textContent = c.weight.toFixed(1);
-  document.getElementById('outCost').textContent = c.cost.toLocaleString('es-CL');
-  document.getElementById('outSavings').textContent = c.savings;
 
   document.getElementById('outDensityTag').innerHTML = `<span class="stat-tag">${DENSITY_LABEL[state.density]}</span>`;
 
@@ -644,7 +695,45 @@ function render() {
     return `<tr><td class="ingredient">${r[0]}</td><td class="role">${r[1]}</td><td class="num">${val} ${r[3]}</td></tr>`;
   }).join('');
 
+  renderCosts(c);
   renderLote(c);
+}
+
+// ============ COSTOS (panel separado) ============
+function renderCosts(c) {
+  document.getElementById('costOutCost').textContent = c.cost.toLocaleString('es-CL');
+  document.getElementById('costOutSavings').textContent = c.savings;
+
+  const breakdown = [];
+  if (c.malto > 0) breakdown.push(['Maltodextrina', c.malto, PRICES.maltodextrin]);
+  if (c.fructose > 0) breakdown.push(['Fructosa', c.fructose, PRICES.fructose]);
+  if (c.pectin > 0) breakdown.push(['Pectina', c.pectin, PRICES.pectin]);
+  if (c.citricAcid > 0) breakdown.push(['Ácido cítrico', c.citricAcid, PRICES.citricAcid]);
+  if (c.calciumLactate > 0) breakdown.push(['Lactato de calcio', c.calciumLactate, PRICES.calciumLactate]);
+  if (c.sodiumCitrate > 0) breakdown.push(['Citrato de sodio', c.sodiumCitrate, PRICES.sodiumCitrate]);
+  if (c.caffeineG > 0) breakdown.push(['Cafeína anhidra', c.caffeineG, PRICES.caffeine]);
+
+  let rowsHtml = breakdown.map(([name, qty, price]) => `
+    <tr>
+      <td class="ingredient">${name}</td>
+      <td class="num">${qty.toFixed(2)} g</td>
+      <td class="num">$${price.toLocaleString('es-CL')}</td>
+      <td class="num">$${Math.round(qty * price).toLocaleString('es-CL')}</td>
+    </tr>`).join('');
+  rowsHtml += `
+    <tr>
+      <td class="ingredient">Sachet</td>
+      <td class="num">1 ud</td>
+      <td class="num">—</td>
+      <td class="num">$${PRICES.sachet.toLocaleString('es-CL')}</td>
+    </tr>
+    <tr class="cost-total-row">
+      <td class="ingredient">Total</td>
+      <td></td>
+      <td></td>
+      <td class="num">$${c.cost.toLocaleString('es-CL')}</td>
+    </tr>`;
+  document.getElementById('costBreakdownBody').innerHTML = rowsHtml;
 }
 
 function renderLote(c) {
@@ -664,6 +753,7 @@ function renderLote(c) {
     const val = r[2] === 'mg' || r[2] === 'ud' ? r[1].toFixed(0) : r[1].toFixed(1);
     return `<tr><td>${r[0]}</td><td>${val} ${r[2]}</td></tr>`;
   }).join('');
+  document.getElementById('loteCostN').textContent = n;
   document.getElementById('loteCost').textContent = (c.cost * n).toLocaleString('es-CL');
 }
 
@@ -799,6 +889,7 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === `panel-${tab}`));
   if (tab === 'batches') renderBatches();
+  if (tab === 'bitacora' && bitacoraCtl) bitacoraCtl.refreshBatches();
 }
 
 // ============ STORAGE ============
@@ -958,6 +1049,22 @@ function renderCompareView() {
   </div>`;
 }
 
+// ============ BITÁCORA INIT ============
+let bitacoraCtl = null;
+function initBitacora() {
+  const dateEl = document.getElementById('bitacoraDate');
+  dateEl.value = new Date().toLocaleDateString('en-CA');
+  bitacoraCtl = renderBitacoraPanel({
+    listEl: document.getElementById('bitacoraList'),
+    formEl: document.getElementById('bitacoraForm'),
+    dateEl,
+    textEl: document.getElementById('bitacoraText'),
+    batchSelectEl: document.getElementById('bitacoraBatch'),
+    getBatches: () => savedBatches,
+    toast: showToast
+  });
+}
+
 // ============ INIT ============
 function init() {
   loadState();
@@ -968,6 +1075,7 @@ function init() {
   applyDensity(state.density);
   attachEvents();
   render();
+  initBitacora();
 }
 init();
 </script>

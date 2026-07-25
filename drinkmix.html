@@ -13,7 +13,7 @@
 
 <header>
   <div class="brand">
-    <span>Nutrición Deportiva</span>
+    <a href="index.html">Nutrición Deportiva</a>
     <span class="sep">/</span>
     <span class="sub">Drink Mix</span>
   </div>
@@ -26,6 +26,8 @@
 <nav class="tabs">
   <button class="tab-btn active" data-tab="calc">Calculadora</button>
   <button class="tab-btn" data-tab="prep">Preparación</button>
+  <button class="tab-btn" data-tab="costos">Costos</button>
+  <button class="tab-btn" data-tab="bitacora">Bitácora</button>
   <button class="tab-btn" data-tab="science">Ciencia</button>
   <button class="tab-btn" data-tab="batches">Lotes <span id="batchCount" style="opacity:0.5;"></span></button>
 </nav>
@@ -178,7 +180,7 @@
       <div class="calc-side outputs">
         <div class="section-title">Resultado</div>
 
-        <div class="stats-grid">
+        <div class="stats-grid cols-3">
           <div class="stat-card">
             <div class="stat-label">Carbos</div>
             <div class="stat-value"><span id="outCarbs">80</span><span class="stat-unit">g</span></div>
@@ -194,15 +196,7 @@
             <div class="stat-value"><span id="outSod">290</span><span class="stat-unit">mg</span></div>
             <div class="stat-sub"><span id="outSodL">580</span> mg/L</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-label">Costo unidad</div>
-            <div class="stat-value">$<span id="outCost">605</span><span class="stat-unit">CLP</span></div>
-            <div class="stat-sub">ingredientes + sachet</div>
-          </div>
         </div>
-
-        <div class="subsection-label" style="margin-top:0;">Comparativa comercial</div>
-        <div id="commercialComp"></div>
 
         <div class="table-wrap" style="margin-top: 20px;">
           <div class="table-header">
@@ -229,10 +223,6 @@
             <span style="font-family: var(--font-mono); font-size: 12px;">sachets · cantidades totales:</span>
           </div>
           <table class="lote-table" id="loteTable"></table>
-          <div class="lote-total">
-            <span>Costo total lote</span>
-            <span>$<span id="loteCost">6050</span> CLP</span>
-          </div>
         </div>
 
         <div class="actions">
@@ -287,6 +277,78 @@
         <div class="step-note">Tip: agua fría disuelve más rápido y mejora la palatabilidad. Con calor (&gt;20°C) puede ser menos refrescante.</div>
       </div>
     </div>
+  </section>
+
+  <!-- ============ COSTOS ============ -->
+  <section class="panel" id="panel-costos">
+    <div style="margin-bottom: 24px;">
+      <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">Costos del drink mix</h2>
+      <p style="color: var(--ink-soft); font-size: 14px;">Desglose de costo por insumo y comparación contra productos comerciales.</p>
+    </div>
+
+    <div class="stats-grid" style="grid-template-columns: 1fr; max-width: 260px;">
+      <div class="stat-card">
+        <div class="stat-label">Costo unidad</div>
+        <div class="stat-value">$<span id="costOutCost">605</span><span class="stat-unit">CLP</span></div>
+        <div class="stat-sub">ingredientes + sachet</div>
+      </div>
+    </div>
+
+    <div class="subsection-label" style="margin-top:0;">Comparativa comercial</div>
+    <div id="commercialComp" style="margin-bottom:20px;"></div>
+
+    <div class="table-wrap">
+      <div class="table-header">
+        <span class="table-title">Desglose de costo (1 sachet)</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Insumo</th>
+            <th class="right">Cantidad</th>
+            <th class="right">Precio/g</th>
+            <th class="right">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody id="costBreakdownBody"></tbody>
+      </table>
+    </div>
+    <div class="prices-footnote">Precios de referencia · mmpp.cl, actualizado jul-2026. <span class="price-note">Cloruro de sodio: no vendido en mmpp.cl, precio referencial sin verificar.</span></div>
+
+    <div class="lote-cost-line">
+      <span class="label">Costo lote actual (<span id="loteCostN">10</span> sachets)</span>
+      <span class="value">$<span id="loteCost">6050</span> CLP</span>
+    </div>
+  </section>
+
+  <!-- ============ BITÁCORA ============ -->
+  <section class="panel" id="panel-bitacora">
+    <div style="margin-bottom: 24px;">
+      <h2 style="font-size: 24px; font-weight: 600; margin-bottom: 8px;">Bitácora</h2>
+      <p style="color: var(--ink-soft); font-size: 14px;">Notas de entrenamiento y carrera. Se comparte con la calculadora de gel.</p>
+    </div>
+
+    <form class="bitacora-form" id="bitacoraForm">
+      <div>
+        <span class="field-label">Fecha</span>
+        <input type="date" id="bitacoraDate">
+      </div>
+      <div>
+        <span class="field-label">Vincular a lote (opcional)</span>
+        <select id="bitacoraBatch"></select>
+      </div>
+      <div class="full-row">
+        <div>
+          <span class="field-label">Nota</span>
+          <textarea id="bitacoraText" placeholder="ej: drink mix preset B en calor, buena tolerancia, sabor muy salado..."></textarea>
+        </div>
+      </div>
+      <div class="full-row" style="justify-content:flex-end;">
+        <button type="submit" class="btn">Guardar nota</button>
+      </div>
+    </form>
+
+    <div id="bitacoraList"></div>
   </section>
 
   <!-- ============ CIENCIA ============ -->
@@ -377,6 +439,7 @@
 
 <div class="toast" id="toast">Lote guardado</div>
 
+<script src="shared.js"></script>
 <script>
 // ============ CONSTANTS ============
 const PRESETS = {
@@ -388,16 +451,7 @@ const PRESETS = {
 const NA_PER_G = { citrate: 267, chloride: 394, mix: 330 };
 const K_PER_G = 381;
 
-const COSTS = {
-  maltodextrin: 5,
-  fructose: 8,
-  sodiumCitrate: 5,
-  sodiumChloride: 0.5,
-  potassiumCitrate: 30,
-  citricAcid: 10,
-  caffeine: 1000,
-  sachet: 65
-};
+// Precios de insumos: ver PRICES en shared.js (mmpp.cl)
 
 const COMMERCIAL = [
   { name: 'Maurten Drink Mix 320', price: 6500, carbs: 79 },
@@ -446,14 +500,14 @@ function calculate() {
   const sodiumPerL = (state.sodium / state.volume) * 1000;
 
   const cost = Math.round(
-    malto * COSTS.maltodextrin +
-    fructose * COSTS.fructose +
-    sodiumCitrateG * COSTS.sodiumCitrate +
-    sodiumChlorideG * COSTS.sodiumChloride +
-    potassiumCitrateG * COSTS.potassiumCitrate +
-    citricG * COSTS.citricAcid +
-    caffeineG * COSTS.caffeine +
-    COSTS.sachet
+    malto * PRICES.maltodextrin +
+    fructose * PRICES.fructose +
+    sodiumCitrateG * PRICES.sodiumCitrate +
+    sodiumChlorideG * PRICES.sodiumChloride +
+    potassiumCitrateG * PRICES.potassiumCitrate +
+    citricG * PRICES.citricAcid +
+    caffeineG * PRICES.caffeine +
+    PRICES.sachet
   );
 
   return { malto, fructose, sodiumCitrateG, sodiumChlorideG, potassiumCitrateG, citricG, caffeineG, concentration, sodiumPerL, cost };
@@ -474,7 +528,6 @@ function render() {
   document.getElementById('outConc').textContent = c.concentration.toFixed(1);
   document.getElementById('outSod').textContent = state.sodium;
   document.getElementById('outSodL').textContent = Math.round(c.sodiumPerL);
-  document.getElementById('outCost').textContent = c.cost.toLocaleString('es-CL');
 
   const tonicity = getTonicityClass(c.concentration);
   document.getElementById('concTag').innerHTML = `<span class="${tonicity.cls}">${tonicity.label}</span>`;
@@ -498,14 +551,50 @@ function render() {
     return `<tr><td class="ingredient">${r[0]}</td><td class="role">${r[1]}</td><td class="num">${val} ${r[3]}</td></tr>`;
   }).join('');
 
-  // Commercial comparison
+  renderCosts(c);
+  renderLote(c);
+}
+
+// ============ COSTOS (panel separado) ============
+function renderCosts(c) {
+  document.getElementById('costOutCost').textContent = c.cost.toLocaleString('es-CL');
+
   document.getElementById('commercialComp').innerHTML = COMMERCIAL.map(comm => {
     const equivCost = comm.price * (state.carbs / comm.carbs);
     const savings = Math.round(((equivCost - c.cost) / equivCost) * 100);
     return `<div class="comp-row"><span class="comp-label">vs ${comm.name}</span><span class="comp-savings">−${savings}%</span></div>`;
   }).join('');
 
-  renderLote(c);
+  const breakdown = [];
+  if (c.malto > 0) breakdown.push(['Maltodextrina', c.malto, PRICES.maltodextrin, false]);
+  if (c.fructose > 0) breakdown.push(['Fructosa cristalina', c.fructose, PRICES.fructose, false]);
+  if (c.sodiumCitrateG > 0) breakdown.push(['Citrato de sodio', c.sodiumCitrateG, PRICES.sodiumCitrate, false]);
+  if (c.sodiumChlorideG > 0) breakdown.push(['Cloruro de sodio', c.sodiumChlorideG, PRICES.sodiumChloride, true]);
+  if (c.potassiumCitrateG > 0) breakdown.push(['Citrato de potasio', c.potassiumCitrateG, PRICES.potassiumCitrate, false]);
+  if (c.citricG > 0) breakdown.push(['Ácido cítrico', c.citricG, PRICES.citricAcid, false]);
+  if (c.caffeineG > 0) breakdown.push(['Cafeína anhidra', c.caffeineG, PRICES.caffeine, false]);
+
+  let rowsHtml = breakdown.map(([name, qty, price, unverified]) => `
+    <tr>
+      <td class="ingredient">${name}${unverified ? ' <span class="price-note">no verificado</span>' : ''}</td>
+      <td class="num">${qty.toFixed(2)} g</td>
+      <td class="num">$${price.toLocaleString('es-CL')}</td>
+      <td class="num">$${Math.round(qty * price).toLocaleString('es-CL')}</td>
+    </tr>`).join('');
+  rowsHtml += `
+    <tr>
+      <td class="ingredient">Sachet</td>
+      <td class="num">1 ud</td>
+      <td class="num">—</td>
+      <td class="num">$${PRICES.sachet.toLocaleString('es-CL')}</td>
+    </tr>
+    <tr class="cost-total-row">
+      <td class="ingredient">Total</td>
+      <td></td>
+      <td></td>
+      <td class="num">$${c.cost.toLocaleString('es-CL')}</td>
+    </tr>`;
+  document.getElementById('costBreakdownBody').innerHTML = rowsHtml;
 }
 
 function renderLote(c) {
@@ -524,6 +613,7 @@ function renderLote(c) {
     const val = r[2] === 'mg' || r[2] === 'ud' ? r[1].toFixed(0) : r[1].toFixed(1);
     return `<tr><td>${r[0]}</td><td>${val} ${r[2]}</td></tr>`;
   }).join('');
+  document.getElementById('loteCostN').textContent = n;
   document.getElementById('loteCost').textContent = (c.cost * n).toLocaleString('es-CL');
 }
 
@@ -661,6 +751,7 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === `panel-${tab}`));
   if (tab === 'batches') renderBatches();
+  if (tab === 'bitacora' && bitacoraCtl) bitacoraCtl.refreshBatches();
 }
 
 // ============ STORAGE ============
@@ -820,6 +911,22 @@ function renderCompareView() {
   </div>`;
 }
 
+// ============ BITÁCORA INIT ============
+let bitacoraCtl = null;
+function initBitacora() {
+  const dateEl = document.getElementById('bitacoraDate');
+  dateEl.value = new Date().toLocaleDateString('en-CA');
+  bitacoraCtl = renderBitacoraPanel({
+    listEl: document.getElementById('bitacoraList'),
+    formEl: document.getElementById('bitacoraForm'),
+    dateEl,
+    textEl: document.getElementById('bitacoraText'),
+    batchSelectEl: document.getElementById('bitacoraBatch'),
+    getBatches: () => savedBatches,
+    toast: showToast
+  });
+}
+
 // ============ INIT ============
 function init() {
   loadState();
@@ -829,6 +936,7 @@ function init() {
   document.querySelectorAll('[data-volume]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.volume) === state.volume));
   attachEvents();
   render();
+  initBitacora();
 }
 init();
 </script>
